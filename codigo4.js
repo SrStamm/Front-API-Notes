@@ -1,0 +1,199 @@
+// Instancias
+let loginButton = document.getElementById('ingresar');
+let registerButton = document.getElementById('registerBtn');
+let noteButton = document.getElementById('noteBtn');
+let showLoginFormButton = document.getElementById('loginBtn');
+let showLogoutFormButton = document.getElementById('logoutBtn');
+let newNotebtn = document.getElementById('newNoteBtn');
+
+let loginFormElement = document.getElementById('loginForm');
+let registerFormElement = document.getElementById('registerForm');
+let showNewNote = document.getElementById('noteForm');
+let createNewNote = document.getElementById('createNoteBtn');
+let notesSection = document.getElementById('notesSection'); // Obtener la sección de notas
+
+// Funciones
+
+function Notes() {
+    loginFormElement.style.display = 'none';
+    registerFormElement.style.display = 'none';
+    showLoginFormButton.style.display = 'none';
+    registerButton.style.display = 'none';
+    noteButton.style.display = 'block';
+    showLogoutFormButton.style.display = 'block';
+    notesSection.style.display = 'block'; // Mostrar la sección de notas
+
+    showUserNotes();
+}
+
+// Eventos
+
+showLoginFormButton.addEventListener('click', () => {
+    loginFormElement.style.display = 'block';
+    registerFormElement.style.display = 'none';
+    showLoginFormButton.style.display = 'none';
+    registerButton.style.display = 'block';
+});
+
+registerButton.addEventListener('click', () => {
+    loginFormElement.style.display = 'none';
+    registerFormElement.style.display = 'block';
+    showLoginFormButton.style.display = 'block';
+    registerButton.style.display = 'none';
+});
+
+function showUserNotes() {
+    const notesContainer = document.getElementById('notesContainer');
+    const noteTemplate = document.getElementById('noteTemplate');
+
+    fetch('http://127.0.0.1:8000/notes/personal/',{
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        return response.json();
+    })
+    .then(notes => {
+        notesContainer.innerHTML = '';
+        notes.forEach(note => {
+            const noteCard = noteTemplate.content.cloneNode(true);
+            const categoryElement = noteCard.querySelector('.note-category');
+            const textElement = noteCard.querySelector('.note-text');
+            const dateElement = noteCard.querySelector('.note-date');
+
+            categoryElement.textContent = note.category;
+            textElement.textContent = note.text;
+            const date = new Date(note.created_at);
+            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            dateElement.textContent = formattedDate;
+
+            const editButton = noteCard.querySelector('.editBtn');
+            const deleteButton = noteCard.querySelector('.deleteBtn');
+            const shareButton = noteCard.querySelector('.shareBtn');
+
+            editButton.addEventListener('click', () => console.log('Editar nota:', note.id));
+            deleteButton.addEventListener('click', () => console.log('Eliminar nota:', note.id));
+            shareButton.addEventListener('click', () => console.log('Compartir nota:', note.id));
+
+            notesContainer.appendChild(noteCard);
+        });
+    })
+    .catch(error => console.log('Error al mostrar las notas: ', error));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Verificar si hay un token al cargar la página para mostrar las notas directamente
+    if (localStorage.getItem('access_token')) {
+        Notes();
+    } else {
+        // Si no hay token, mostrar el formulario de login
+        loginFormElement.style.display = 'block';
+        showLoginFormButton.style.display = 'none';
+    }
+});
+
+function createUserNotes() {
+    let text = document.getElementById('noteText').value;
+    let category = document.getElementById('noteCategory').value;
+    let tags = document.getElementById('noteTags').value;
+
+    const formData = new URLSearchParams();
+    formData.append('text', text);
+    formData.append('category', category);
+    formData.append('tags', tags);
+
+    fetch('http://127.0.0.1:8000/notes/',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`
+            },
+            body: formData.toString()
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`)
+            }
+            console.log('Nota creada exitosamente!');
+            document.getElementById('noteFormElement').reset();
+            showUserNotes();
+        })
+        .catch(error => console.log('Error al crear la nota: ', error));
+};
+
+loginButton.addEventListener('click', () => {
+    let username = document.getElementById('username').value;
+    let password = document.getElementById('current-password').value;
+
+    fetch('http://127.0.0.1:8000/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            username: username,
+            password: password
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(json => {
+        window.localStorage.setItem('access_token', json.access_token);
+        window.localStorage.setItem('refresh_token', json.refresh_token);
+        window.localStorage.setItem('token_type', 'Bearer');
+        Notes(); // Llamar a Notes() después de guardar los tokens
+    })
+    .catch(error => console.log('Error:', error));
+});
+
+showLogoutFormButton.addEventListener('click', () => {
+    fetch('http://127.0.0.1:8000/logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(json => {
+        window.localStorage.removeItem('access_token');
+        window.localStorage.removeItem('refresh_token');
+        window.localStorage.removeItem('token_type');
+        loginFormElement.style.display = 'block';
+        registerButton.style.display = 'block';
+        noteButton.style.display = 'none';
+        showLogoutFormButton.style.display = 'none';
+        notesSection.style.display = 'none'; // Ocultar la sección de notas al cerrar sesión
+    })
+    .catch(error => console.log('Error:', error));
+});
+
+newNotebtn.addEventListener('click', () => {
+    noteButton.style.display = 'none';
+    showLogoutFormButton.style.display = 'none';
+    showNewNote.style.display = 'block';
+    newNotebtn.style.display = 'none';
+});
+
+createNewNote.addEventListener('click', () => {
+    createUserNotes();
+    noteButton.style.display = 'block';
+    showLogoutFormButton.style.display = 'block';
+    showNewNote.style.display = 'none';
+    newNotebtn.style.display = 'block'; // Mostrar el botón de "Nueva Nota" de nuevo
+});
