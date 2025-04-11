@@ -22,6 +22,8 @@ function Notes() {
     noteButton.style.display = 'block';
     showLogoutFormButton.style.display = 'block';
     notesSection.style.display = 'block'; // Mostrar la sección de notas
+    createNewNote.style.display = 'block';
+    newNotebtn.style.display = 'block';
 
     showUserNotes();
 }
@@ -41,6 +43,7 @@ registerButton.addEventListener('click', () => {
     showLoginFormButton.style.display = 'block';
     registerButton.style.display = 'none';
 });
+
 
 function showUserNotes() {
     const notesContainer = document.getElementById('notesContainer');
@@ -101,20 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
 function createUserNotes() {
     let text = document.getElementById('noteText').value;
     let category = document.getElementById('noteCategory').value;
-    let tags = document.getElementById('noteTags').value;
-
-    const formData = new URLSearchParams();
-    formData.append('text', text);
-    formData.append('category', category);
-    formData.append('tags', tags);
 
     fetch('http://127.0.0.1:8000/notes/',{
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
                 'Authorization': `${localStorage.getItem('token_type')} ${localStorage.getItem('access_token')}`
             },
-            body: formData.toString()
+            body: JSON.stringify({
+                text: text,
+                category: category
+            })
         })
         .then(response => {
             if (!response.ok) {
@@ -126,6 +126,7 @@ function createUserNotes() {
         })
         .catch(error => console.log('Error al crear la nota: ', error));
 };
+
 
 loginButton.addEventListener('click', () => {
     let username = document.getElementById('username').value;
@@ -151,10 +152,11 @@ loginButton.addEventListener('click', () => {
         window.localStorage.setItem('access_token', json.access_token);
         window.localStorage.setItem('refresh_token', json.refresh_token);
         window.localStorage.setItem('token_type', 'Bearer');
-        Notes(); // Llamar a Notes() después de guardar los tokens
+        Notes();
     })
     .catch(error => console.log('Error:', error));
 });
+
 
 showLogoutFormButton.addEventListener('click', () => {
     fetch('http://127.0.0.1:8000/logout', {
@@ -184,10 +186,11 @@ showLogoutFormButton.addEventListener('click', () => {
 });
 
 newNotebtn.addEventListener('click', () => {
-    noteButton.style.display = 'none';
+    noteButton.style.display = 'block';
     showLogoutFormButton.style.display = 'none';
     showNewNote.style.display = 'block';
     newNotebtn.style.display = 'none';
+    notesSection.style.display = 'none';
 });
 
 createNewNote.addEventListener('click', () => {
@@ -196,4 +199,12 @@ createNewNote.addEventListener('click', () => {
     showLogoutFormButton.style.display = 'block';
     showNewNote.style.display = 'none';
     newNotebtn.style.display = 'block'; // Mostrar el botón de "Nueva Nota" de nuevo
+});
+
+noteButton.addEventListener('click', () => {
+    noteButton.style.display = 'block';
+    showLogoutFormButton.style.display = 'block';
+    showNewNote.style.display = 'none';
+    newNotebtn.style.display = 'block';
+    Notes();
 });
