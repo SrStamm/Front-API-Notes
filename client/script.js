@@ -6,15 +6,20 @@ let showRegisterBtn = document.getElementById("showRegister");
 let showLoginBtn = document.getElementById("showLogin");
 let logoutBtn = document.getElementById("logoutBtn");
 let userBtn = document.getElementById("userBtn");
+let addNoteBtn = document.getElementById("addNoteBtn");
+
+let saveNoteBtn = document.getElementById("saveNoteBtn");
 
 // Formularios
 let registerForm = document.getElementById("registerForm");
 let registerElement = document.getElementById("registerFormElement");
+let noteForm = document.getElementById("noteForm");
 
 let loginForm = document.getElementById("loginForm");
 let loginElement = document.getElementById("loginFormElement");
 
 let notesSection = document.getElementById("notesSection");
+let noteFormElement = document.getElementById("noteFormElement");
 
 let messageContainer = document.getElementById("messageContainer");
 
@@ -24,6 +29,14 @@ function loginAcccessSuccess() {
   notesSection.style.display = "block";
   logoutBtn.style.display = "block";
   userBtn.style.display = "block";
+}
+
+function unauthorizedAccess() {
+  loginForm.style.display = "block";
+
+  notesSection.style.display = "none";
+  logoutBtn.style.display = "none";
+  userBtn.style.display = "none";
 }
 
 showRegisterBtn.addEventListener("click", () => {
@@ -52,6 +65,47 @@ function showMessage(message, type = "error") {
     messageContainer.textContent = "";
   }, 4500);
 }
+
+// Verifica el estado de la sesión del Usuario
+async function checkUserSession() {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    if (!token) {
+      return false;
+    }
+
+    const response = await fetch(url + "/users/me", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    if (!response.ok) {
+      return "error";
+    } else {
+      return "success";
+    }
+  } catch (error) {
+    console.error("Error al verificar el estado:", error);
+    showMessage("Debe iniciar sesión nuevamente", "error");
+  }
+}
+
+// Evento que se ejecuta al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+  const response = checkUserSession();
+
+  if (response == "error") {
+    loginForm.style.display = "block";
+    notesSection.style.display = "none";
+  } else {
+    loginAcccessSuccess();
+    showNotes();
+  }
+});
 
 // Enviar formulario
 registerElement.addEventListener("submit", async (event) => {
@@ -207,7 +261,77 @@ async function showNotes() {
       textNote.textContent = notes.text;
       categoryNote.textContent = notes.category;
 
+      // Botones
+
+      let editNotesBtn = document.getElementById(".editBtn");
+      let deleteNoteBtn = clonTemplate.querySelector(".deleteBtn");
+
+      // Eliminar nota
+      deleteNoteBtn.addEventListener("click", async () => {
+        try {
+          const response = await fetch(url + `/notes/${notes.id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: "Bearer " + token,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            console.error("Error al eliminar la nota");
+          }
+
+          showMessage("Nota eliminada exitosamente.", "success");
+          showNotes();
+        } catch (error) {
+          showMessage("No se pudo eliminar la nota", "error");
+        }
+      });
+
       notesContainer.appendChild(clonTemplate);
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error al acceder a las notas:", error);
+    showMessage(`Error: ${error.message}`, "error");
+  }
 }
+
+addNoteBtn.addEventListener("click", async () => {
+  noteForm.style.display = "block";
+  notesSection.style.display = "none";
+});
+
+saveNoteBtn.addEventListener("click", async (event) => {
+  event.preventDefault();
+
+  token = localStorage.getItem("authToken");
+
+  data = {
+    text: document.getElementById("noteText").value,
+    category: document.getElementById("noteCategory").value,
+  };
+
+  try {
+    const response = await fetch(url + "/notes/", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      console.error("Error: ", response);
+      throw new Error("Error: No se pudo crear la nota");
+    }
+
+    showMessage("Nota creada con éxito!", "success");
+    document.getElementById("noteFormElement").reset();
+  } catch (error) {
+    console.log("Error: ", error);
+    showMessage("Error al crear la nota");
+  }
+});
+
+// Usuarios
