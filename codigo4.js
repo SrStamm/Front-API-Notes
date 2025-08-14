@@ -7,6 +7,8 @@ let showLogoutFormButton = document.getElementById('logoutBtn');
 let newNotebtn = document.getElementById('newNoteBtn');
 
 let loginFormElement = document.getElementById('loginForm');
+let createUser = document.getElementById('registrarse');
+let readUser = document.getElementById('userBtn');
 let registerFormElement = document.getElementById('registerForm');
 let showNewNote = document.getElementById('noteForm');
 let createNewNote = document.getElementById('createNoteBtn');
@@ -15,11 +17,12 @@ let notesSection = document.getElementById('notesSection'); // Obtener la secciÃ
 // Funciones
 
 function Notes() {
+    showNewNote.style.display = 'none';
     loginFormElement.style.display = 'none';
     registerFormElement.style.display = 'none';
     showLoginFormButton.style.display = 'none';
     registerButton.style.display = 'none';
-    noteButton.style.display = 'block';
+    noteButton.style.display = 'none';
     showLogoutFormButton.style.display = 'block';
     notesSection.style.display = 'block'; // Mostrar la secciÃ³n de notas
     createNewNote.style.display = 'block';
@@ -45,6 +48,7 @@ registerButton.addEventListener('click', () => {
 });
 
 
+// Funcion que muestra las notas del usuario
 function showUserNotes() {
     const notesContainer = document.getElementById('notesContainer');
     const noteTemplate = document.getElementById('noteTemplate');
@@ -101,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Funcion que crea una nueva nota
 function createUserNotes() {
     let text = document.getElementById('noteText').value;
     let category = document.getElementById('noteCategory').value;
@@ -122,12 +127,13 @@ function createUserNotes() {
             }
             console.log('Nota creada exitosamente!');
             document.getElementById('noteFormElement').reset();
-            showUserNotes();
+            Notes();
         })
         .catch(error => console.log('Error al crear la nota: ', error));
 };
 
 
+// Evento que logea un usuario 
 loginButton.addEventListener('click', () => {
     let username = document.getElementById('username').value;
     let password = document.getElementById('current-password').value;
@@ -153,11 +159,46 @@ loginButton.addEventListener('click', () => {
         window.localStorage.setItem('refresh_token', json.refresh_token);
         window.localStorage.setItem('token_type', 'Bearer');
         Notes();
+        let token = json
     })
     .catch(error => console.log('Error:', error));
 });
 
 
+// Evento que crea un nuevo usuario
+createUser.addEventListener('click', () => {
+    let username = document.getElementById('newUsername').value;
+    let password = document.getElementById('newPassword').value;
+    let email = document.getElementById('newEmail').value;
+
+    fetch('http://127.0.0.1:8000/users/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password,
+            email: email
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(json => {
+        loginFormElement.style.display = 'block';
+        registerFormElement.style.display = 'none';
+        showLoginFormButton.style.display = 'none';
+        registerButton.style.display = 'block';
+    })
+    .catch(error => console.log('Error:', error));
+});
+
+
+// Evento que cierra sesion
 showLogoutFormButton.addEventListener('click', () => {
     fetch('http://127.0.0.1:8000/logout', {
         method: 'POST',
@@ -202,9 +243,5 @@ createNewNote.addEventListener('click', () => {
 });
 
 noteButton.addEventListener('click', () => {
-    noteButton.style.display = 'block';
-    showLogoutFormButton.style.display = 'block';
-    showNewNote.style.display = 'none';
-    newNotebtn.style.display = 'block';
     Notes();
 });
