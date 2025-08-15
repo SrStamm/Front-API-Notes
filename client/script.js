@@ -1,6 +1,9 @@
 // URL del servidor
 const url = "http://localhost:8000";
 
+// variable global
+let currentNoteId = 0;
+
 // Botones
 let showRegisterBtn = document.getElementById("showRegister");
 let showLoginBtn = document.getElementById("showLogin");
@@ -276,7 +279,7 @@ async function showNotes() {
 
       // Botones
 
-      let editNotesBtn = document.getElementById(".editBtn");
+      let editNotesBtn = clonTemplate.querySelector(".editBtn");
       let deleteNoteBtn = clonTemplate.querySelector(".deleteBtn");
 
       // Eliminar nota
@@ -299,6 +302,18 @@ async function showNotes() {
         } catch (error) {
           showMessage("No se pudo eliminar la nota", "error");
         }
+      });
+
+      editNotesBtn.addEventListener("click", async () => {
+        occultNotes();
+        noteForm.style.display = "block";
+        myNotesBtn.style.display = "block";
+
+        currentNoteId = notes.id;
+
+        document.querySelector("#noteText").value = notes.text;
+        document.querySelector("#noteCategory").value = notes.category;
+        document.querySelector("#formTitle").textContent = "Editando Nota";
       });
 
       notesContainer.appendChild(clonTemplate);
@@ -324,6 +339,14 @@ addNoteBtn.addEventListener("click", async () => {
 saveNoteBtn.addEventListener("click", async (event) => {
   event.preventDefault();
 
+  if (currentNoteId == 0) {
+    saveNote();
+  } else {
+    editNote();
+  }
+});
+
+async function saveNote() {
   token = localStorage.getItem("authToken");
 
   data = {
@@ -352,7 +375,37 @@ saveNoteBtn.addEventListener("click", async (event) => {
     console.log("Error: ", error);
     showMessage("Error al crear la nota");
   }
-});
+}
+
+async function editNote() {
+  token = localStorage.getItem("authToken");
+
+  data = {
+    text: document.getElementById("noteText").value,
+    category: document.getElementById("noteCategory").value,
+  };
+
+  try {
+    const response = await fetch(url + `/notes/${currentNoteId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      console.error("Error: ", response);
+      throw new Error("Error: No se pudo editar la nota");
+    }
+
+    showMessage("Nota editada con éxito!", "success");
+  } catch (error) {
+    console.log("Error: ", error);
+    showMessage("Error al editar la nota");
+  }
+}
 
 cancelNoteBtn.addEventListener("click", () => {
   document.getElementById("noteFormElement").reset();
