@@ -7,7 +7,8 @@ let showLoginBtn = document.getElementById("showLogin");
 let logoutBtn = document.getElementById("logoutBtn");
 let userBtn = document.getElementById("userBtn");
 let addNoteBtn = document.getElementById("addNoteBtn");
-
+let cancelNoteBtn = document.getElementById("cancelNoteBtn");
+let myNotesBtn = document.getElementById("noteBtn");
 let saveNoteBtn = document.getElementById("saveNoteBtn");
 
 // Formularios
@@ -20,6 +21,8 @@ let loginElement = document.getElementById("loginFormElement");
 
 let notesSection = document.getElementById("notesSection");
 let noteFormElement = document.getElementById("noteFormElement");
+
+let userSection = document.getElementById("usersSection");
 
 let messageContainer = document.getElementById("messageContainer");
 
@@ -37,6 +40,11 @@ function unauthorizedAccess() {
   notesSection.style.display = "none";
   logoutBtn.style.display = "none";
   userBtn.style.display = "none";
+}
+
+function occultNotes() {
+  notesSection.style.display = "none";
+  myNotesBtn.style.display = "none";
 }
 
 showRegisterBtn.addEventListener("click", () => {
@@ -84,9 +92,9 @@ async function checkUserSession() {
     });
 
     if (!response.ok) {
-      return "error";
+      return false;
     } else {
-      return "success";
+      return true;
     }
   } catch (error) {
     console.error("Error al verificar el estado:", error);
@@ -98,9 +106,9 @@ async function checkUserSession() {
 document.addEventListener("DOMContentLoaded", () => {
   const response = checkUserSession();
 
-  if (response == "error") {
+  if (response == false) {
     loginForm.style.display = "block";
-    notesSection.style.display = "none";
+    occultNotes();
   } else {
     loginAcccessSuccess();
     showNotes();
@@ -212,10 +220,13 @@ logoutBtn.addEventListener("click", async () => {
       throw new Error(errorData.detail || "Error al cerrar sesión");
     }
 
+    localStorage.removeItem("authToken");
+
     loginForm.style.display = "block";
-    notesSection.style.display = "none";
+    occultNotes();
+    noteForm.style.display = "none";
     logoutBtn.style.display = "none";
-    userBtn.style.display = "none";
+    occultUsers();
 
     showMessage("Sesión cerrada correctamente", "success");
   } catch (error) {
@@ -246,6 +257,8 @@ async function showNotes() {
     let listNotes = await response.json();
 
     let notesContainer = document.getElementById("notesContainer");
+
+    notesContainer.innerHTML = "";
 
     // Obtiene el template de la nota
     const noteTemplate = document.getElementById("noteTemplate");
@@ -292,13 +305,20 @@ async function showNotes() {
     });
   } catch (error) {
     console.error("Error al acceder a las notas:", error);
-    showMessage(`Error: ${error.message}`, "error");
+    if (error.message == "Invalid token") {
+      showMessage(`Sesion expirada. Inicie sesión nuevamente`, "error");
+      unauthorizedAccess();
+    } else {
+      showMessage(`Error Interno`, "error");
+      unauthorizedAccess();
+    }
   }
 }
 
 addNoteBtn.addEventListener("click", async () => {
   noteForm.style.display = "block";
   notesSection.style.display = "none";
+  myNotesBtn.style.display = "block";
 });
 
 saveNoteBtn.addEventListener("click", async (event) => {
@@ -334,4 +354,75 @@ saveNoteBtn.addEventListener("click", async (event) => {
   }
 });
 
+cancelNoteBtn.addEventListener("click", () => {
+  document.getElementById("noteFormElement").reset();
+  noteForm.style.display = "none";
+  myNotesBtn.style.display = "none";
+
+  notesSection.style.display = "block";
+  showNotes();
+});
+
+myNotesBtn.addEventListener("click", () => {
+  noteForm.style.display = "none";
+  myNotesBtn.style.display = "none";
+
+  notesSection.style.display = "block";
+  showNotes();
+  occultUsers();
+  userBtn.style.display = "block";
+});
+
 // Usuarios
+async function showUsers() {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const response = await fetch(url + "/users/all-users/", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error("Error:", errorData.message);
+    }
+
+    // Obtiene la lista de Usuarios
+    const userList = await response.json();
+
+    let userTableBody = document.getElementById("usersTableBody");
+
+    userTableBody.innerHTML = "";
+
+    // Obtiene el template de la nota
+    const userTemplate = document.getElementById("userTemplate");
+
+    userList.forEach((user) => {
+      const clonTemplate = userTemplate.content.cloneNode(true);
+
+      // Accede a cada parte del template
+      clonTemplate.querySelector(".userId").textContent = user.user_id;
+      clonTemplate.querySelector(".userName").textContent = user.username;
+
+      userTableBody.appendChild(clonTemplate);
+    });
+  } catch (error) {}
+}
+
+function occultUsers() {
+  userSection.style.display = "none";
+  userBtn.style.display = "none";
+}
+
+userBtn.addEventListener("click", () => {
+  userSection.style.display = "block";
+  showUsers();
+
+  occultNotes();
+  userBtn.style.display = "none";
+  myNotesBtn.style.display = "block";
+});
