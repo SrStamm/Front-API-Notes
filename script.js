@@ -74,7 +74,7 @@ function showMessage(message, type = "error") {
   setTimeout(() => {
     messageContainer.style.display = "none";
     messageContainer.textContent = "";
-  }, 4500);
+  }, 4000);
 }
 
 // Verifica el estado de la sesión del Usuario
@@ -417,6 +417,7 @@ cancelNoteBtn.addEventListener("click", () => {
 });
 
 myNotesBtn.addEventListener("click", () => {
+  document.getElementById("noteFormElement").reset();
   noteForm.style.display = "none";
   myNotesBtn.style.display = "none";
 
