@@ -202,7 +202,11 @@ loginElement.addEventListener("submit", async (event) => {
     }
   } catch (error) {
     console.error("Error en el inicio de sesión:", error);
-    showMessage(`Error: ${error.message}`, "error");
+    if (error.message == "NetworkError when attempting to fetch resource.") {
+      showMessage("Error interno");
+    } else {
+      showMessage(`Error: ${error.message}`, "error");
+    }
   }
 });
 
@@ -281,6 +285,7 @@ async function showNotes() {
 
       let editNotesBtn = clonTemplate.querySelector(".editBtn");
       let deleteNoteBtn = clonTemplate.querySelector(".deleteBtn");
+      let shareNoteBtn = clonTemplate.querySelector(".shareBtn");
 
       // Eliminar nota
       deleteNoteBtn.addEventListener("click", async () => {
@@ -314,6 +319,17 @@ async function showNotes() {
         document.querySelector("#noteText").value = notes.text;
         document.querySelector("#noteCategory").value = notes.category;
         document.querySelector("#formTitle").textContent = "Editando Nota";
+        document.querySelector("#saveNoteBtn").textContent = "Editar";
+      });
+
+      shareNoteBtn.addEventListener("click", async () => {
+        occultNotes();
+        userSection.style.display = "block";
+        myNotesBtn.style.display = "block";
+        userBtn.style.display = "none";
+        showUsers();
+
+        currentNoteId = notes.id;
       });
 
       notesContainer.appendChild(clonTemplate);
@@ -343,6 +359,10 @@ saveNoteBtn.addEventListener("click", async (event) => {
     saveNote();
   } else {
     editNote();
+    noteForm.style.display = "none";
+    notesSection.style.display = "block";
+    myNotesBtn.style.display = "none";
+    showNotes();
   }
 });
 
@@ -462,6 +482,50 @@ async function showUsers() {
       clonTemplate.querySelector(".userId").textContent = user.user_id;
       clonTemplate.querySelector(".userName").textContent = user.username;
 
+      shareBtn = clonTemplate.querySelector(".shadeUserBtn");
+
+      shareBtn.addEventListener("click", async () => {
+        if (currentNoteId == 0) {
+          showMessage(
+            "Error: Primero se debe seleccionar la nota a compartir",
+            "error",
+          );
+          throw new Error(
+            "Error: Primero se debe seleccionar la nota a compartir",
+          );
+        }
+
+        data = { note_id: currentNoteId, shared_user_id: user.user_id };
+
+        const response = await fetch(
+          url + `/notes/${data.note_id}/shared/${data.shared_user_id}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + token,
+              "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify(data),
+          },
+        );
+
+        if (!response.ok) {
+          console.error("Error: ", response);
+          const errorData = await response.json();
+          if (errorData.detail == "Ya se ha compartido esta nota") {
+            showMessage("Está nota ya fue compartida al usuario", "error");
+            throw new Error("Error: Esta nota ya fue compartida");
+          }
+          throw new Error("Error: No se pudo compartir la nota");
+        }
+
+        showMessage("Nota compartida con éxito!", "success");
+        userSection.style.display = "none";
+        notesSection.style.display = "block";
+        showNotes();
+      });
+
       userTableBody.appendChild(clonTemplate);
     });
   } catch (error) {}
@@ -479,4 +543,5 @@ userBtn.addEventListener("click", () => {
   occultNotes();
   userBtn.style.display = "none";
   myNotesBtn.style.display = "block";
+  noteForm.style.display = "none";
 });
