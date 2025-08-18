@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestor de Notas</title>
+    <link href="style1.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="header">
+      <nav class="nav container">
+        <h1>Gestor de Notas</h1>
+        <div class="auth-section">
+          <button class="btn btn-primary" id="newNoteBtn" style="display: none">
+            Nueva nota
+          </button>
+          <button class="btn btn-primary" id="noteBtn" style="display: none">
+            Mis notas
+          </button>
+          <button
+            class="btn btn-info"
+            id="sharedNotesBtn"
+            style="display: none"
+          >
+            Notas compartidas
+          </button>
+          <button class="btn btn-secondary" id="userBtn" style="display: none">
+            Usuarios
+          </button>
+          <button class="btn btn-danger" id="logoutBtn" style="display: none">
+            Cerrar Sesión
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container">
+      <!-- Mensaje de estado -->
+      <div class="alert" id="messageContainer"></div>
+
+      <!-- Sección de notas -->
+      <section class="section" id="notesSection" style="display: none">
+        <div class="section-header">
+          <h2>Mis Notas</h2>
+          <button class="btn btn-primary" id="addNoteBtn">Agregar Nota</button>
+        </div>
+        <div class="grid" id="notesContainer"></div>
+      </section>
+
+      <!-- Sección de usuarios -->
+      <section class="section" id="usersSection" style="display: none">
+        <div class="section-header">
+          <h2>Todos los usuarios</h2>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <th>ID</th>
+              <th>Nombre</th>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Formulario de Login -->
+      <div class="form-container" id="loginForm">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginFormElement">
+          <div class="form-group">
+            <label for="username">Usuario:</label>
+            <input
+              type="text"
+              id="username"
+              required
+              placeholder="Ingrese el nombre de usuario"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="current-password">Contraseña</label>
+            <input
+              type="password"
+              id="current-password"
+              required
+              placeholder="Ingrese su contraseña"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="ingresar">
+            Ingresar
+          </button>
+          <p>
+            No tienes una cuenta?
+            <a href="#" id="showRegister">Registrese aquí</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Formulario de Register -->
+      <div class="form-container" id="registerForm" style="display: none">
+        <h2>Registrarse</h2>
+        <form id="registerFormElement">
+          <div class="form-group">
+            <label for="newUsername">Nombre de usuario</label>
+            <input
+              type="text"
+              id="newUsername"
+              required
+              placeholder="Ingrese un nombre de usuario"
+            />
+          </div>
+          <div class="form-group">
+            <label for="newEmail">Email</label>
+            <input
+              type="email"
+              id="newEmail"
+              required
+              placeholder="Ingrese un email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">Contraseña</label>
+            <input
+              type="password"
+              id="newPassword"
+              required
+              placeholder="Ingrese una contraseña"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary" id="registrarse">
+            Registrarse
+          </button>
+          <p>
+            Ya tienes una cuenta?
+            <a href="#" id="showLogin">Inicia sesión aquí</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Formulario para crear una nueva nota -->
+      <div class="form-container" id="noteForm" style="display: none">
+        <h2 class="formTitle">Nueva nota</h2>
+        <form id="noteFormElement">
+          <div class="form-group">
+            <label for="noteText">Texto:</label>
+            <textarea
+              id="noteText"
+              rows="5"
+              required
+              placeholder="Escriab el texto de la nota..."
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="noteCategory">Categoría:</label>
+            <select id="noteCategory" required>
+              <option value="" disabled selected>Seleccione una opción</option>
+              <option value="work">Trabajo</option>
+              <option value="study">Estudio</option>
+              <option value="unknown">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="noteTags">Etiquetas (separadas por coma)</label>
+            <input
+              type="text"
+              id="noteTags"
+              placeholder="ejemplo: importante, proyecto, recordatorio"
+            />
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-primary" id="saveNoteBtn">
+              Guardar
+            </button>
+            <button type="button" class="btn btn-light" id="cancelNoteBtn">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Template de nota -->
+    <template id="noteTemplate">
+      <div class="card">
+        <div class="card-header">
+          <span class="badge" id="noteCategoryBadge"></span>
+          <span class="badge" id="noteOriginalUserID"></span>
+          <small class="text-muted note-date"></small>
+        </div>
+        <p class="note-text"></p>
+        <div class="tags" id="noteTagsContainer"></div>
+        <div class="card-actions">
+          <button type="button" class="btn btn-primary editBtn">Editar</button>
+          <button type="button" class="btn btn-danger deleteBtn">
+            Eliminar
+          </button>
+          <button type="button" class="btn btn-success shareBtn">
+            Compartir
+          </button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Template de Usuarios -->
+    <template id="userTemplate">
+      <tr>
+        <td class="userId"></td>
+        <td class="userName"></td>
+        <td>
+          <button type="button" class="btn btn-warning btn-sm shadeUserBtn">
+            Compartir
+          </button>
+        </td>
+      </tr>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>

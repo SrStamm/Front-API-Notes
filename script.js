@@ -376,6 +376,15 @@ async function saveNote() {
     category: document.getElementById("noteCategory").value,
   };
 
+  if (!data.text) {
+    showMessage("Se debe agregar el texto", "error");
+    throw new Error("Error: Falta el texto");
+  }
+  if (!data.category) {
+    showMessage("Se debe seleccionar una categoria", "error");
+    throw new Error("Error: Falta la categoria");
+  }
+
   try {
     const response = await fetch(url + "/notes/", {
       method: "POST",
@@ -461,6 +470,7 @@ notesSharedToMe.addEventListener("click", () => {
   document.getElementById("addNoteBtn").style.display = "none";
   notesSharedToMe.style.display = "none";
   myNotesBtn.style.display = "block";
+  occultUsers();
 
   showSharedNotes();
 });
@@ -651,6 +661,7 @@ userBtn.addEventListener("click", () => {
 
   occultNotes();
   userBtn.style.display = "none";
+  notesSharedToMe.style.display = "none";
   myNotesBtn.style.display = "block";
   noteForm.style.display = "none";
 });
