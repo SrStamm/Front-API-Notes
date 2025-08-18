@@ -35,18 +35,18 @@
           <button class="btn btn-primary" id="noteBtn" style="display: none">
             <i class="fas fa-sticky-note"></i> Mis Notas
           </button>
-          <button class="btn btn-secondary" id="userBtn" style="display: none">
-            <i class="fas fa-users"></i> Usuarios
-          </button>
-          <button class="btn btn-danger" id="logoutBtn" style="display: none">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-          </button>
           <button
             class="btn btn-info"
             id="sharedNotesBtn"
             style="display: none"
           >
             <i class="fas fa-share-square"></i> Notas Compartidas
+          </button>
+          <button class="btn btn-secondary" id="userBtn" style="display: none">
+            <i class="fas fa-users"></i> Usuarios
+          </button>
+          <button class="btn btn-danger" id="logoutBtn" style="display: none">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
           </button>
         </div>
       </nav>
@@ -208,6 +208,7 @@
       <div class="card">
         <div class="card-header">
           <span class="badge" id="noteCategoryBadge"></span>
+          <span class="badge" id="noteOriginalUserID"></span>
           <small class="text-muted note-date"></small>
         </div>
         <p class="note-text"></p>

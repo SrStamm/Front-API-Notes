@@ -12,6 +12,7 @@ let userBtn = document.getElementById("userBtn");
 let addNoteBtn = document.getElementById("addNoteBtn");
 let cancelNoteBtn = document.getElementById("cancelNoteBtn");
 let myNotesBtn = document.getElementById("noteBtn");
+let notesSharedToMe = document.getElementById("sharedNotesBtn");
 let saveNoteBtn = document.getElementById("saveNoteBtn");
 
 // Formularios
@@ -35,6 +36,7 @@ function loginAcccessSuccess() {
   notesSection.style.display = "block";
   logoutBtn.style.display = "block";
   userBtn.style.display = "block";
+  notesSharedToMe.style.display = "block";
 }
 
 function unauthorizedAccess() {
@@ -106,8 +108,8 @@ async function checkUserSession() {
 }
 
 // Evento que se ejecuta al cargar la página
-document.addEventListener("DOMContentLoaded", () => {
-  const response = checkUserSession();
+document.addEventListener("DOMContentLoaded", async () => {
+  const response = await checkUserSession();
 
   if (response == false) {
     loginForm.style.display = "block";
@@ -440,12 +442,95 @@ myNotesBtn.addEventListener("click", () => {
   document.getElementById("noteFormElement").reset();
   noteForm.style.display = "none";
   myNotesBtn.style.display = "none";
+  notesSharedToMe.style.display = "block";
+
+  const container = document.getElementById("notesSection");
+  container.querySelector("h2").textContent = "Mis Notas";
+  addNoteBtn.style.display = "block";
 
   notesSection.style.display = "block";
   showNotes();
   occultUsers();
   userBtn.style.display = "block";
 });
+
+notesSharedToMe.addEventListener("click", () => {
+  const container = document.getElementById("notesSection");
+  container.querySelector("h2").textContent = "Notas compartidas";
+  document.getElementById("notesContainer").innerHTML = "";
+  document.getElementById("addNoteBtn").style.display = "none";
+  notesSharedToMe.style.display = "none";
+  myNotesBtn.style.display = "block";
+
+  showSharedNotes();
+});
+
+async function showSharedNotes() {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const response = await fetch(url + "/notes/shared/", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error al obtener las notas");
+    }
+
+    // Obtiene las notas
+    let listNotes = await response.json();
+
+    let notesContainer = document.getElementById("notesContainer");
+
+    notesContainer.innerHTML = "";
+
+    // Obtiene el template de la nota
+    const noteTemplate = document.getElementById("noteTemplate");
+
+    for (let notes of listNotes) {
+      const clonTemplate = noteTemplate.content.cloneNode(true);
+
+      // Accede a cada parte del template
+      const textNote = clonTemplate.querySelector(".note-text");
+      const categoryNote = clonTemplate.querySelector("#noteCategoryBadge");
+      const originalUserId = clonTemplate.querySelector("#noteOriginalUserID");
+
+      // Obtiene información del usuario que compartio la nota
+      const userData = await getUserWhitId(notes.original_user_id);
+
+      // Actualiza
+      textNote.textContent = notes.text;
+      categoryNote.textContent = notes.category;
+      originalUserId.textContent = userData.username;
+
+      // Botones
+      let editNotesBtn = clonTemplate.querySelector(".editBtn");
+      let deleteNoteBtn = clonTemplate.querySelector(".deleteBtn");
+      let shareNoteBtn = clonTemplate.querySelector(".shareBtn");
+
+      if (notes.original_user_id >= 0) {
+        editNotesBtn.style.display = "none";
+        deleteNoteBtn.style.display = "none";
+        shareNoteBtn.style.display = "none";
+      }
+
+      notesContainer.appendChild(clonTemplate);
+    }
+  } catch (error) {
+    console.error("Error al acceder a las notas:", error);
+    if (error.message == "Invalid token") {
+      showMessage(`Sesion expirada. Inicie sesión nuevamente`, "error");
+      unauthorizedAccess();
+    } else {
+      showMessage(`Error Interno`, "error");
+    }
+  }
+}
 
 // Usuarios
 async function showUsers() {
@@ -529,6 +614,30 @@ async function showUsers() {
       userTableBody.appendChild(clonTemplate);
     });
   } catch (error) {}
+}
+
+async function getUserWhitId(id) {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const response = await fetch(url + `/users/${id}`, {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error al obtener el usuario");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al obtener el usuario:", error);
+    showMessage("Error interno", "error");
+  }
 }
 
 function occultUsers() {
