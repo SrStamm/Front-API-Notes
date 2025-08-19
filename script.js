@@ -743,9 +743,46 @@ async function getAllSessions() {
       clonTemplate.querySelector(".sessionId").textContent = session.session_id;
       clonTemplate.querySelector(".active").textContent = session.is_active;
 
+      // Accede al boton
+      let deleteSessionBtn = clonTemplate.querySelector("#deleteSessionBtn");
+
+      // Evento para eliminar la sesion
+      deleteSessionBtn.addEventListener("click", async () => {
+        await deleteSession(session.session_id);
+      });
+
       userTableBody.appendChild(clonTemplate);
     });
   } catch (error) {
     console.error("Error: ", error);
+  }
+}
+
+async function deleteSession(id) {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const response = await fetch(url + `/sessions/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error("Error: ", errorData);
+    }
+
+    const responseData = await response.json();
+    showMessage(responseData.detail, "success");
+  } catch (error) {
+    console.error("Error: ", error);
+    showMessage(`Error: ${error.message}`, "error");
+
+    let userTableBody = document.getElementById("sessionTableBody");
+    userTableBody.innerHTML = "";
+    getAllSessions();
   }
 }
