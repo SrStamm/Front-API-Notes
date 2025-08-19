@@ -14,6 +14,7 @@ let cancelNoteBtn = document.getElementById("cancelNoteBtn");
 let myNotesBtn = document.getElementById("noteBtn");
 let notesSharedToMe = document.getElementById("sharedNotesBtn");
 let saveNoteBtn = document.getElementById("saveNoteBtn");
+let actualUserBtn = document.getElementById("actualUserBtn");
 
 // Formularios
 let registerForm = document.getElementById("registerForm");
@@ -37,6 +38,7 @@ function loginAcccessSuccess() {
   logoutBtn.style.display = "block";
   userBtn.style.display = "block";
   notesSharedToMe.style.display = "block";
+  actualUserBtn.style.display = "block";
 }
 
 function unauthorizedAccess() {
@@ -45,6 +47,7 @@ function unauthorizedAccess() {
   notesSection.style.display = "none";
   logoutBtn.style.display = "none";
   userBtn.style.display = "none";
+  actualUserBtn.style.display = "none";
 }
 
 function occultNotes() {
@@ -315,6 +318,7 @@ async function showNotes() {
         occultNotes();
         noteForm.style.display = "block";
         myNotesBtn.style.display = "block";
+        actualUserBtn.style.display = "block";
 
         currentNoteId = notes.id;
 
@@ -328,6 +332,7 @@ async function showNotes() {
         occultNotes();
         userSection.style.display = "block";
         myNotesBtn.style.display = "block";
+        actualUserBtn.style.display = "block";
         userBtn.style.display = "none";
         showUsers();
 
@@ -352,6 +357,7 @@ addNoteBtn.addEventListener("click", async () => {
   noteForm.style.display = "block";
   notesSection.style.display = "none";
   myNotesBtn.style.display = "block";
+  actualUserBtn.style.display = "block";
 });
 
 saveNoteBtn.addEventListener("click", async (event) => {
@@ -364,6 +370,7 @@ saveNoteBtn.addEventListener("click", async (event) => {
     noteForm.style.display = "none";
     notesSection.style.display = "block";
     myNotesBtn.style.display = "none";
+    actualUserBtn.style.display = "block";
     showNotes();
   }
 });
@@ -442,6 +449,7 @@ cancelNoteBtn.addEventListener("click", () => {
   document.getElementById("noteFormElement").reset();
   noteForm.style.display = "none";
   myNotesBtn.style.display = "none";
+  actualUserBtn.style.display = "block";
 
   notesSection.style.display = "block";
   showNotes();
@@ -451,6 +459,7 @@ myNotesBtn.addEventListener("click", () => {
   document.getElementById("noteFormElement").reset();
   noteForm.style.display = "none";
   myNotesBtn.style.display = "none";
+  actualUserBtn.style.display = "block";
   notesSharedToMe.style.display = "block";
 
   const container = document.getElementById("notesSection");
@@ -471,6 +480,8 @@ notesSharedToMe.addEventListener("click", () => {
   notesSharedToMe.style.display = "none";
   myNotesBtn.style.display = "block";
   occultUsers();
+  actualUserBtn.style.display = "none";
+  document.getElementById("actualUserSection").style.display = "none";
 
   showSharedNotes();
 });
@@ -665,3 +676,76 @@ userBtn.addEventListener("click", () => {
   myNotesBtn.style.display = "block";
   noteForm.style.display = "none";
 });
+
+// Actual user
+actualUserBtn.addEventListener("click", async () => {
+  occultNotes();
+  occultUsers();
+
+  notesSharedToMe.style.display = "block";
+  myNotesBtn.style.display = "block";
+  document.getElementById("actualUserSection").style.display = "block";
+  await showActualUser();
+  await getAllSessions();
+});
+
+async function showActualUser() {
+  const token = localStorage.getItem("authToken");
+  try {
+    const response = await fetch(url + "/users/me", {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error");
+    }
+
+    const data = await response.json();
+
+    document.getElementById("actualUsername").textContent = data.username;
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+}
+
+async function getAllSessions() {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const response = await fetch(url + "/sessions", {
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const dataError = await response.json();
+      throw new Error("Error: ", dataError.message);
+    }
+
+    const data = await response.json();
+
+    let userTableBody = document.getElementById("sessionTableBody");
+
+    userTableBody.innerHTML = "";
+
+    // Obtiene el template de la nota
+    const userTemplate = document.getElementById("userSessionTemplate");
+
+    data.forEach((session) => {
+      const clonTemplate = userTemplate.content.cloneNode(true);
+
+      // Accede a cada parte del template
+      clonTemplate.querySelector(".sessionId").textContent = session.session_id;
+      clonTemplate.querySelector(".active").textContent = session.is_active;
+
+      userTableBody.appendChild(clonTemplate);
+    });
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+}

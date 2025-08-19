@@ -27,6 +27,13 @@
           <button class="btn btn-secondary" id="userBtn" style="display: none">
             Usuarios
           </button>
+          <button
+            class="btn btn-success"
+            id="actualUserBtn"
+            style="display: none"
+          >
+            Mi perfil
+          </button>
           <button class="btn btn-danger" id="logoutBtn" style="display: none">
             Cerrar Sesión
           </button>
@@ -60,6 +67,28 @@
             </thead>
             <tbody id="usersTableBody"></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- Sección de usuario actual -->
+      <section class="section" id="actualUserSection" style="display: none">
+        <div class="section-header">
+          <h2>Perfil</h2>
+        </div>
+        <div class="">
+          <p>Nombre: <span id="actualUsername"></span></p>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <th>ID</th>
+              <th>Activo</th>
+            </thead>
+            <tbody id="sessionTableBody"></tbody>
+          </table>
+        </div>
+        <div>
+          <button class="btn btn-danger">Cerrrar todas las sesiones</button>
         </div>
       </section>
 
@@ -148,7 +177,7 @@
               id="noteText"
               rows="5"
               required
-              placeholder="Escriab el texto de la nota..."
+              placeholder="Escriba el texto de la nota..."
             ></textarea>
           </div>
           <div class="form-group">
@@ -215,6 +244,18 @@
       </tr>
     </template>
 
+    <!-- Template de Sessions -->
+    <template id="userSessionTemplate">
+      <tr>
+        <td class="sessionId"></td>
+        <td class="active"></td>
+        <td>
+          <button type="button" class="btn btn-warning btn-sm deleteSessionBtn">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </template>
     <script src="script.js"></script>
   </body>
 </html>
