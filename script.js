@@ -15,6 +15,7 @@ let myNotesBtn = document.getElementById("noteBtn");
 let notesSharedToMe = document.getElementById("sharedNotesBtn");
 let saveNoteBtn = document.getElementById("saveNoteBtn");
 let actualUserBtn = document.getElementById("actualUserBtn");
+let closeAllSessionsBtn = document.getElementById("closeAllSessionsBtn");
 
 // Formularios
 let registerForm = document.getElementById("registerForm");
@@ -343,7 +344,7 @@ async function showNotes() {
     });
   } catch (error) {
     console.error("Error al acceder a las notas:", error);
-    if (error.message == "Invalid token") {
+    if (error.message == "Invalid token" || error == "Usuario no autenticado") {
       showMessage(`Sesion expirada. Inicie sesión nuevamente`, "error");
       unauthorizedAccess();
     } else {
@@ -739,19 +740,22 @@ async function getAllSessions() {
     data.forEach((session) => {
       const clonTemplate = userTemplate.content.cloneNode(true);
 
-      // Accede a cada parte del template
-      clonTemplate.querySelector(".sessionId").textContent = session.session_id;
-      clonTemplate.querySelector(".active").textContent = session.is_active;
+      if (session.is_active == true) {
+        // Accede a cada parte del template
+        clonTemplate.querySelector(".sessionId").textContent =
+          session.session_id;
+        clonTemplate.querySelector(".active").textContent = session.is_active;
 
-      // Accede al boton
-      let deleteSessionBtn = clonTemplate.querySelector("#deleteSessionBtn");
+        // Accede al boton
+        let deleteSessionBtn = clonTemplate.querySelector("#deleteSessionBtn");
 
-      // Evento para eliminar la sesion
-      deleteSessionBtn.addEventListener("click", async () => {
-        await deleteSession(session.session_id);
-      });
+        // Evento para eliminar la sesion
+        deleteSessionBtn.addEventListener("click", async () => {
+          await deleteSession(session.session_id);
+        });
 
-      userTableBody.appendChild(clonTemplate);
+        userTableBody.appendChild(clonTemplate);
+      }
     });
   } catch (error) {
     console.error("Error: ", error);
@@ -786,3 +790,31 @@ async function deleteSession(id) {
     getAllSessions();
   }
 }
+
+closeAllSessionsBtn.addEventListener("click", async () => {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const response = await fetch(url + "/sessions/all-sessions", {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const dataError = await response.json();
+      throw new Error(dataError.detail);
+    }
+
+    showMessage("Sesiones cerradas exitosamente.", "success");
+    location.reload();
+  } catch (error) {
+    if (error == "Usuario no autenticado") {
+      unauthorizedAccess();
+      showMessage("Necesita iniciar sesión nuevamente", "error");
+    }
+    console.error("Error: ", error);
+  }
+});
