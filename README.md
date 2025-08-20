@@ -37,18 +37,23 @@ Este proyecto depende de la API Notes:
 👉 [API-Notes](https://github.com/SrStamm/API-Notes)
 
 ## 📸 Capturas
-```markdown
+Login
 ![Pantalla de Login](assets/login.png)
 
+Inicio - Lista de notas
 ![Inicio - Notas creadas](assets/inicio.png)
 
+Form para crear la nota
 ![Form para crear una nota](assets/Crear-nota.png)
 
+Form para editar una nota
 ![Form para editar una nota existente](assets/editar-nota.png)
 
+Lista de notas compartidas con el usuario
 ![Notas compartidas con el usuario](assets/notas-compartidas.png)
 
+Lista de usuarios existentes
 ![Lista de usuarios existentes](assets/usuarios.png)
 
+Tabla con las sesiones activas del usuario
 ![Tabla que muestra las sesiones activas del usuario](assets/sesiones-activas.png)
-```
