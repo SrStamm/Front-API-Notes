@@ -1,11 +1,13 @@
 :root {
-  --primary-color: #4361ee;
-  --secondary-color: #3a0ca3;
-  --success-color: #4cc9f0;
-  --danger-color: #f72585;
-  --warning-color: #f8961e;
-  --light-color: #f8f9fa;
-  --dark-color: #212529;
+  --primary-color: #588157; /* Verde oliva oscuro para elementos principales y botones */
+  --secondary-color: #a3b18a; /* Verde salvia para elementos secundarios */
+  --success-color: #344e41; /* Verde pino para éxito y confirmaciones */
+  --danger-color: #bc4749; /* Rojo ladrillo para errores o acciones peligrosas */
+  --warning-color: #f6bd60; /* Amarillo mostaza para advertencias */
+  --light-color: #fefae0; /* Blanco crema para fondos */
+  --dark-color: #333d29; /* Marrón oscuro para texto y detalles */
+
+  /* Mantén tus variables existentes */
   --border-radius: 8px;
   --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --transition: all 0.3s ease;

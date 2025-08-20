@@ -49,6 +49,7 @@ function unauthorizedAccess() {
   logoutBtn.style.display = "none";
   userBtn.style.display = "none";
   actualUserBtn.style.display = "none";
+  notesSharedToMe.style.display = "none";
 }
 
 function occultNotes() {
@@ -385,11 +386,9 @@ async function saveNote() {
   };
 
   if (!data.text) {
-    showMessage("Se debe agregar el texto", "error");
-    throw new Error("Error: Falta el texto");
+    throw new Error("Falta el texto");
   }
   if (!data.category) {
-    showMessage("Se debe seleccionar una categoria", "error");
     throw new Error("Error: Falta la categoria");
   }
 
@@ -404,15 +403,21 @@ async function saveNote() {
     });
 
     if (!response.ok) {
-      console.error("Error: ", response);
-      throw new Error("Error: No se pudo crear la nota");
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error al crear la nota");
     }
 
     showMessage("Nota creada con éxito!", "success");
     document.getElementById("noteFormElement").reset();
   } catch (error) {
     console.log("Error: ", error);
-    showMessage("Error al crear la nota");
+    if (error == "Se debe agregar el texto") {
+      showMessage("Se debe agregar el texto", "error");
+    } else if (error == "Falta la categoría") {
+      showMessage("Se debe seleccionar una categoria", "error");
+    } else {
+      showMessage("Error interno", "error");
+    }
   }
 }
 
@@ -435,14 +440,18 @@ async function editNote() {
     });
 
     if (!response.ok) {
-      console.error("Error: ", response);
-      throw new Error("Error: No se pudo editar la nota");
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Error al editar la nota");
     }
 
     showMessage("Nota editada con éxito!", "success");
   } catch (error) {
     console.log("Error: ", error);
-    showMessage("Error al editar la nota");
+    if (error == "Error al editar la nota") {
+      showMessage("Error al editar la nota", "error");
+    } else {
+      showMessage("Error interno", "error");
+    }
   }
 }
 
@@ -467,6 +476,7 @@ myNotesBtn.addEventListener("click", () => {
   container.querySelector("h2").textContent = "Mis Notas";
   addNoteBtn.style.display = "block";
 
+  document.getElementById("actualUserSection").style.display = "none";
   notesSection.style.display = "block";
   showNotes();
   occultUsers();
@@ -569,7 +579,7 @@ async function showUsers() {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error("Error:", errorData.message);
+      throw new Error(errorData.detail || "Error al obtener los usuarios");
     }
 
     // Obtiene la lista de Usuarios
@@ -593,13 +603,7 @@ async function showUsers() {
 
       shareBtn.addEventListener("click", async () => {
         if (currentNoteId == 0) {
-          showMessage(
-            "Error: Primero se debe seleccionar la nota a compartir",
-            "error",
-          );
-          throw new Error(
-            "Error: Primero se debe seleccionar la nota a compartir",
-          );
+          throw new Error("Nota no seleccionada");
         }
 
         data = { note_id: currentNoteId, shared_user_id: user.user_id };
@@ -618,13 +622,8 @@ async function showUsers() {
         );
 
         if (!response.ok) {
-          console.error("Error: ", response);
           const errorData = await response.json();
-          if (errorData.detail == "Ya se ha compartido esta nota") {
-            showMessage("Está nota ya fue compartida al usuario", "error");
-            throw new Error("Error: Esta nota ya fue compartida");
-          }
-          throw new Error("Error: No se pudo compartir la nota");
+          throw new Error(errorData.detail);
         }
 
         showMessage("Nota compartida con éxito!", "success");
@@ -635,7 +634,20 @@ async function showUsers() {
 
       userTableBody.appendChild(clonTemplate);
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error: ", error);
+
+    if (error == "Nota no seleccionada") {
+      showMessage(
+        "Error: Primero se debe seleccionar la nota a compartir",
+        "error",
+      );
+    } else if (error == "Ya se ha compartido esta nota") {
+      showMessage("Está nota ya fue compartida al usuario", "error");
+    } else {
+      showMessage("Error interno", "error");
+    }
+  }
 }
 
 async function getUserWhitId(id) {
@@ -657,7 +669,7 @@ async function getUserWhitId(id) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error al obtener el usuario:", error);
+    console.error("Error: ", error);
     showMessage("Error interno", "error");
   }
 }
@@ -670,6 +682,7 @@ function occultUsers() {
 userBtn.addEventListener("click", () => {
   userSection.style.display = "block";
   showUsers();
+  document.getElementById("actualUserSection").style.display = "none";
 
   occultNotes();
   userBtn.style.display = "none";
@@ -701,7 +714,8 @@ async function showActualUser() {
     });
 
     if (!response.ok) {
-      throw new Error("Error");
+      const dataError = await response.json();
+      throw new Error(dataError.detail || "Error al obtener el usuario actual");
     }
 
     const data = await response.json();
@@ -709,6 +723,7 @@ async function showActualUser() {
     document.getElementById("actualUsername").textContent = data.username;
   } catch (error) {
     console.error("Error: ", error);
+    showMessage("Error interno", "error");
   }
 }
 
@@ -725,7 +740,7 @@ async function getAllSessions() {
 
     if (!response.ok) {
       const dataError = await response.json();
-      throw new Error("Error: ", dataError.message);
+      throw new Error(dataError.detail);
     }
 
     const data = await response.json();
@@ -759,6 +774,7 @@ async function getAllSessions() {
     });
   } catch (error) {
     console.error("Error: ", error);
+    showMessage("Error interno", "error");
   }
 }
 
@@ -776,18 +792,14 @@ async function deleteSession(id) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error("Error: ", errorData);
+      throw new Error(errorData.detail);
     }
 
     const responseData = await response.json();
     showMessage(responseData.detail, "success");
   } catch (error) {
     console.error("Error: ", error);
-    showMessage(`Error: ${error.message}`, "error");
-
-    let userTableBody = document.getElementById("sessionTableBody");
-    userTableBody.innerHTML = "";
-    getAllSessions();
+    showMessage("Error interno", "error");
   }
 }
 
@@ -811,10 +823,10 @@ closeAllSessionsBtn.addEventListener("click", async () => {
     showMessage("Sesiones cerradas exitosamente.", "success");
     location.reload();
   } catch (error) {
+    console.error("Error: ", error);
     if (error == "Usuario no autenticado") {
       unauthorizedAccess();
       showMessage("Necesita iniciar sesión nuevamente", "error");
     }
-    console.error("Error: ", error);
   }
 });
