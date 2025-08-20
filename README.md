@@ -33,4 +33,9 @@ Abre el archivo `index.html` en tu navegador o usa una extensión como Live Serv
 ## 🌐 Backend
 
 Este proyecto depende de la API Notes:
-👉 API-Notes
+
+👉 [API-Notes](https://github.com/SrStamm/API-Notes)
+
+## 📸 Capturas
+```markdown
+[Pantalla de Login](./assets/login.png)```
