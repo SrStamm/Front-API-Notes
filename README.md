@@ -38,4 +38,16 @@ Este proyecto depende de la API Notes:
 
 ## 📸 Capturas
 ```markdown
-[Pantalla de Login](./assets/login.png)```
+![Pantalla de Login](./assets/login.png)
+
+![Inicio - Notas creadas](./assets/inicio.png)
+
+![Form para crear una nota](./assets/Crear-nota.png)
+
+![Form para editar una nota existente](./assets/editar-nota.png)
+
+![Notas compartidas con el usuario](./assets/notas-compartidas.png)
+
+![Lista de usuarios existentes](./assets/usuarios.png)
+
+![Tabla que muestra las sesiones activas del usuario](./assets/sesiones-activas.png)
