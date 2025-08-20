@@ -326,7 +326,7 @@ async function showNotes() {
 
         document.querySelector("#noteText").value = notes.text;
         document.querySelector("#noteCategory").value = notes.category;
-        document.querySelector("#formTitle").textContent = "Editando Nota";
+        document.querySelector(".formTitle").textContent = "Editando Nota";
         document.querySelector("#saveNoteBtn").textContent = "Editar";
       });
 
@@ -359,7 +359,9 @@ addNoteBtn.addEventListener("click", async () => {
   noteForm.style.display = "block";
   notesSection.style.display = "none";
   myNotesBtn.style.display = "block";
-  actualUserBtn.style.display = "block";
+  actualUserBtn.style.display = "none";
+  userBtn.style.display = "none";
+  notesSharedToMe.style.display = "none";
 });
 
 saveNoteBtn.addEventListener("click", async (event) => {
@@ -696,7 +698,8 @@ actualUserBtn.addEventListener("click", async () => {
   occultNotes();
   occultUsers();
 
-  notesSharedToMe.style.display = "block";
+  notesSharedToMe.style.display = "none";
+  actualUserBtn.style.display = "none";
   myNotesBtn.style.display = "block";
   document.getElementById("actualUserSection").style.display = "block";
   await showActualUser();
