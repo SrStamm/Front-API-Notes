@@ -1,5 +1,8 @@
 import "./App.css";
+import LoginForm from "./modules/LoginForm.tsx";
 import ListCard from "./modules/ListCard";
+import Header from "./modules/Header.tsx";
+import RegisterForm from "./modules/RegisterForm.tsx";
 
 const data = {
   text: "Esto es una nota",
@@ -11,7 +14,12 @@ const data = {
 function App() {
   return (
     <>
-      <ListCard data={data} />
+      <Header />
+      <main className="container">
+        <ListCard data={data} />
+        <LoginForm />
+        <RegisterForm />
+      </main>
     </>
   );
 }

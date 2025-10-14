@@ -97,82 +97,7 @@
         </div>
       </section>
 
-      <!-- Formulario de Login -->
-      <div class="form-container" id="loginForm">
-        <h2>Iniciar Sesión</h2>
-        <form id="loginFormElement">
-          <div class="form-group">
-            <label for="username">Usuario:</label>
-            <input
-              type="text"
-              id="username"
-              required
-              placeholder="Ingrese el nombre de usuario"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="current-password">Contraseña</label>
-            <input
-              type="password"
-              id="current-password"
-              required
-              placeholder="Ingrese su contraseña"
-            />
-          </div>
-          <button type="submit" class="btn btn-primary btn-block" id="ingresar">
-            Ingresar
-          </button>
-          <p>
-            No tienes una cuenta?
-            <a href="#" id="showRegister">Registrese aquí</a>
-          </p>
-        </form>
-      </div>
-
-      <!-- Formulario de Register -->
-      <div class="form-container" id="registerForm" style="display: none">
-        <h2>Registrarse</h2>
-        <form id="registerFormElement">
-          <div class="form-group">
-            <label for="newUsername">Nombre de usuario</label>
-            <input
-              type="text"
-              id="newUsername"
-              required
-              placeholder="Ingrese un nombre de usuario"
-            />
-          </div>
-          <div class="form-group">
-            <label for="newEmail">Email</label>
-            <input
-              type="email"
-              id="newEmail"
-              required
-              placeholder="Ingrese un email"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="newPassword">Contraseña</label>
-            <input
-              type="password"
-              id="newPassword"
-              required
-              placeholder="Ingrese una contraseña"
-            />
-          </div>
-          <button type="submit" class="btn btn-primary" id="registrarse">
-            Registrarse
-          </button>
-          <p>
-            Ya tienes una cuenta?
-            <a href="#" id="showLogin">Inicia sesión aquí</a>
-          </p>
-        </form>
-      </div>
-
-      <!-- Formulario para crear una nueva nota -->
+      <!-- Formulario de Notas -->
       <div class="form-container" id="noteForm" style="display: none">
         <h2 class="formTitle">Nueva nota</h2>
         <form id="noteFormElement">
@@ -213,28 +138,6 @@
         </form>
       </div>
     </main>
-
-    <!-- Template de nota -->
-    <template id="noteTemplate">
-      <div class="card">
-        <div class="card-header">
-          <span class="badge" id="noteCategoryBadge"></span>
-          <span class="badge" id="noteOriginalUserID"></span>
-          <small class="text-muted note-date"></small>
-        </div>
-        <p class="note-text"></p>
-        <div class="tags" id="noteTagsContainer"></div>
-        <div class="card-actions">
-          <button type="button" class="btn btn-primary editBtn">Editar</button>
-          <button type="button" class="btn btn-danger deleteBtn">
-            Eliminar
-          </button>
-          <button type="button" class="btn btn-success shareBtn">
-            Compartir
-          </button>
-        </div>
-      </div>
-    </template>
 
     <!-- Template de Usuarios -->
     <template id="userTemplate">
