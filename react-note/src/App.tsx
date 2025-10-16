@@ -1,26 +1,13 @@
 import "./App.css";
-import LoginForm from "./modules/LoginForm.tsx";
-import ListCard from "./modules/ListCard";
-import Header from "./modules/Header.tsx";
-import RegisterForm from "./modules/RegisterForm.tsx";
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes.tsx";
 
-const data = {
-  text: "Esto es una nota",
-  category: "category",
-  tag: "tag",
-  date: "12/12",
-};
 
 function App() {
   return (
-    <>
-      <Header />
-      <main className="container">
-        <ListCard data={data} />
-        <LoginForm />
-        <RegisterForm />
-      </main>
-    </>
+    <BrowserRouter>
+      <AppRoutes/>
+    </BrowserRouter>
   );
 }
 

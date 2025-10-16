@@ -25,13 +25,14 @@ body {
   color: var(--dark-color);
   min-height: 100vh;
   line-height: 1.6;
+  position: relative;
 }
 
 .container {
   max-width: 1200px;
-  margin: 0 auto;
   padding: 20px;
 }
+
 /* Header */
 .header {
   background: linear-gradient(
@@ -53,6 +54,7 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  margin-left: 20rem;
 }
 
 .auth-section {
@@ -118,16 +120,34 @@ h4 {
 /* Formularios */
 .form-container {
   max-width: 500px;
-  margin: 2rem auto;
+  margin: 0 auto;
   background: white;
   padding: 2rem;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   transition: var(--transition);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .form-container:hover {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form p {
+  margin-top: 1rem;
+}
+
+.form a {
+  text-decoration: none;
+  margin-left: 0.2rem;
 }
 
 .form-title {
@@ -167,6 +187,8 @@ textarea {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
+
+  width: 80%;
 }
 
 .card {

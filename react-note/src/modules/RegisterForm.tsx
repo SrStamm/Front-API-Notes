@@ -1,23 +1,57 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
 function RegisterForm() {
+  // Declaración de los estados
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+
+  // Funciones para cambiar los estados
+  const usernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  };
+
+  const passwordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const emailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  // Evento para crear un usuario
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {};
+
   return (
     <div className="form-container">
       <h2 className="form-title">Registrarse</h2>
-      <form>
+      <form className="form">
         <div className="form-group">
           <input
             type="text"
             required
+            value={username}
+            onChange={usernameChange}
             placeholder="Ingrese un nombre de usuario"
           />
         </div>
         <div className="form-group">
-          <input type="email" required placeholder="Ingrese un email" />
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={emailChange}
+            placeholder="Ingrese un email"
+          />
         </div>
 
         <div className="form-group">
           <input
             type="password"
             required
+            value={password}
+            onChange={passwordChange}
             placeholder="Ingrese una contraseña"
           />
         </div>
@@ -26,7 +60,7 @@ function RegisterForm() {
         </button>
         <p>
           Ya tienes una cuenta?
-          <a href="#">Inicia sesión aquí</a>
+          <Link to="/login">Inicia sesión aquí</Link>
         </p>
       </form>
     </div>
