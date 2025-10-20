@@ -31,6 +31,7 @@ body {
 .container {
   max-width: 1200px;
   padding: 20px;
+  margin: 0 auto;
 }
 
 /* Header */
@@ -305,11 +306,9 @@ textarea {
 }
 
 /* Secciones */
-.section {
-  margin-bottom: 3rem;
-}
 .section-header {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
