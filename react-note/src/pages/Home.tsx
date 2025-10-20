@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Header from "../modules/Header";
 import ListCard from "../modules/ListCard";
 
@@ -18,17 +19,35 @@ const data = [
 ];
 
 export default function Home() {
+  const [currentView, setCurrentView] = useState("notes");
+
+  const props = {
+    currentView: currentView,
+    setCurrentView: setCurrentView,
+  };
   return (
     <>
-      <Header />
+      <Header {...props} />
       <main className="container">
-        <div className="auth-section">
-          <button className="btn btn-primary"> Nueva nota </button>
-          <button className="btn btn-secondary"> Notas compartidas </button>
-          <ListCard data={data} />
-        </div>
+        {currentView === "notes" ? (
+          <>
+            <div className="section-header">
+              <h2>Mis notas</h2>
+              <div className="auth-section">
+                <button className="btn btn-primary"> + </button>
+
+                <button className="btn btn-secondary">
+                  {" "}
+                  Notas compartidas{" "}
+                </button>
+              </div>
+            </div>
+            <ListCard data={data} />
+          </>
+        ) : (
+          <p>Usuarios. No implementado todavia</p>
+        )}
       </main>
     </>
   );
 }
-
