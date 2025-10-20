@@ -1,9 +1,39 @@
+import { useNavigate } from "react-router-dom";
+
 type Props = {
   currentView: string;
   setCurrentView: (view: string) => void;
 };
 
 function Header({ currentView, setCurrentView }: Props) {
+  const navigate = useNavigate();
+
+  const closeSession = async () => {
+    const token = localStorage.getItem("auth_token");
+
+    try {
+      const response = await fetch("http://100.110.201.56:8000/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("auth_token");
+        console.log("Has cerrado sesión con éxito");
+
+        navigate("/login");
+      } else {
+        const dataError = await response.json();
+        console.log("Error:", dataError.detail);
+      }
+    } catch (error) {
+      console.error("Error al intentar conectar con el servidor:", error);
+    }
+  };
+
   return (
     <header className="header">
       <nav className="nav container">
@@ -25,7 +55,9 @@ function Header({ currentView, setCurrentView }: Props) {
             </button>
           )}
           <button className="btn btn-success">Mi perfil</button>
-          <button className="btn btn-danger">Cerrar Sesión</button>
+          <button onClick={closeSession} className="btn btn-danger">
+            Cerrar Sesión
+          </button>
         </div>
       </nav>
     </header>

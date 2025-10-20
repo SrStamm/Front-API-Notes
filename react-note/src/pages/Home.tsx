@@ -25,6 +25,7 @@ export default function Home() {
     currentView: currentView,
     setCurrentView: setCurrentView,
   };
+
   return (
     <>
       <Header {...props} />
