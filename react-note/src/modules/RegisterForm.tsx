@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function RegisterForm() {
   // Declaración de los estados
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+
+  const navigate = useNavigate();
 
   // Funciones para cambiar los estados
   const usernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,12 +23,41 @@ function RegisterForm() {
   };
 
   // Evento para crear un usuario
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {};
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const registerData = {
+      username: username,
+      password: password,
+      email: email,
+    };
+
+    try {
+      const response = await fetch("http://100.110.201.56:8000/users/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registerData),
+      });
+
+      if (response.ok) {
+        console.log("Usuario creado exitosamente");
+
+        navigate("/login");
+      } else {
+        const dataError = await response.json();
+        console.error("Error:", dataError.detail);
+      }
+    } catch (error) {
+      console.log("Error inesperado al crear el usuario", error);
+    }
+  };
 
   return (
     <div className="form-container">
       <h2 className="form-title">Registrarse</h2>
-      <form className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <div className="form-group">
           <input
             type="text"

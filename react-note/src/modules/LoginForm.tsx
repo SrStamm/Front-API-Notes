@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
 
   const usernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
@@ -20,10 +22,8 @@ function LoginForm() {
     formData.append("username", username);
     formData.append("password", password);
 
-    console.log(formData);
-    console.log(new URLSearchParams(formData).toString());
     try {
-      const response = await fetch("http://localhost:8000/login", {
+      const response = await fetch("http://100.110.201.56:8000/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -34,7 +34,12 @@ function LoginForm() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("auth_token", data.access_token);
-        console.log("Login exitoso!", data);
+        console.log("Has iniciado sesión con éxito");
+
+        navigate("/");
+      } else {
+        const dataError = await response.json();
+        console.log("Error:", dataError.detail);
       }
     } catch (error) {
       console.error("Error al intentar conectar con el servidor:", error);
