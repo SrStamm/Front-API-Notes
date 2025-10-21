@@ -1,5 +1,6 @@
 import type React from "react";
 import { useState } from "react";
+import Fetch from "../utils/api";
 
 type ModalProps = {
   modalVisible: boolean;
@@ -8,7 +9,7 @@ type ModalProps = {
 
 type NewNote = {
   text: string;
-  tags: string;
+  tags: string[];
   category: string;
 };
 
@@ -32,13 +33,38 @@ function Modal({ modalVisible, setModalVisible }: ModalProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const tagsArray = tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag !== "");
+
     const NoteData: NewNote = {
       text: text,
       category: category,
-      tags: tags,
+      tags: tagsArray,
     };
 
     console.log(NoteData);
+
+    try {
+      const response = await Fetch({
+        path: "notes/",
+        method: "POST",
+        body: NoteData,
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Detail: ", responseData.detail);
+        setModalVisible(false);
+      } else {
+        console.error("Error al crear la nota");
+        const responseError = await response.json();
+        throw new Error(responseError.detail);
+      }
+    } catch (error) {
+      console.log("Error: ", error);
+    }
   };
 
   return (

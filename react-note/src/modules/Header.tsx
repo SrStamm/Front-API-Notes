@@ -20,7 +20,7 @@ function Header({ currentView, setCurrentView }: Props) {
         },
       });
 
-      if (response.ok) {
+      if (response.ok || response.status === 401) {
         localStorage.removeItem("auth_token");
         console.log("Has cerrado sesión con éxito");
 

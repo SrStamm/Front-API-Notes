@@ -1,20 +1,27 @@
 type FetchProps = {
   path: string;
+  method: string;
   body?: object;
 };
 
-const Fetch = async ({ path, body }: FetchProps) => {
+const Fetch = async ({ path, method, body }: FetchProps) => {
   const token = localStorage.getItem("auth_token");
 
-  const Body = body !== undefined ? body : undefined;
+  const Body = body !== undefined ? JSON.stringify(body) : undefined;
 
-  const response = await fetch("http://100.110.201.56:8000" + path, {
+  const fetchOptions: RequestInit = {
+    method: method,
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     },
-    body: Body,
-  });
+    ...(Body && { body: Body }),
+  };
+
+  const response = await fetch(
+    "http://100.110.201.56:8000/" + path,
+    fetchOptions,
+  );
 
   return response;
 };
