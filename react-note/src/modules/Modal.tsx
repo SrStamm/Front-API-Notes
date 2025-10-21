@@ -1,9 +1,46 @@
+import type React from "react";
+import { useState } from "react";
+
 type ModalProps = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
 };
 
+type NewNote = {
+  text: string;
+  tags: string;
+  category: string;
+};
+
 function Modal({ modalVisible, setModalVisible }: ModalProps) {
+  const [text, setText] = useState("");
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState("");
+
+  const textChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  };
+
+  const categoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategory(e.target.value);
+  };
+
+  const tagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTags(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const NoteData: NewNote = {
+      text: text,
+      category: category,
+      tags: tags,
+    };
+
+    console.log(NoteData);
+  };
+
   return (
     <div
       className={
@@ -20,17 +57,19 @@ function Modal({ modalVisible, setModalVisible }: ModalProps) {
           </button>
           <h2 className="form-title">Nueva nota</h2>
         </div>
-        <form className="form">
+        <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
             <textarea
+              onChange={textChange}
+              value={text}
               rows={5}
               required
               placeholder="Escriba el texto de la nota..."
             ></textarea>
           </div>
           <div className="form-group">
-            <select required>
-              <option disabled selected>
+            <select onChange={categoryChange} value={category} required>
+              <option value="" disabled>
                 Seleccione una categoría
               </option>
               <option value="work">Trabajo</option>
@@ -40,12 +79,13 @@ function Modal({ modalVisible, setModalVisible }: ModalProps) {
           </div>
           <div className="form-group">
             <input
+              onChange={tagsChange}
               type="text"
               placeholder="Escriba los tags separados por coma (importante, proyecto)"
             />
           </div>
           <div className="modal-actions">
-            <button type="button" className="btn btn-primary">
+            <button type="submit" className="btn btn-primary">
               Guardar
             </button>
             <button
