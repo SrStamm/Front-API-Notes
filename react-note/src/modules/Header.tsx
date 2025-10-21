@@ -42,7 +42,7 @@ function Header({ currentView, setCurrentView }: Props) {
           {currentView === "notes" ? (
             <button
               onClick={() => setCurrentView("users")}
-              className="btn btn-secondary"
+              className="btn btn-primary"
             >
               Usuarios{" "}
             </button>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Header from "../modules/Header";
 import ListCard from "../modules/ListCard";
+import Modal from "../modules/Modal";
 
 const data = [
   {
@@ -37,10 +38,7 @@ export default function Home() {
               <div className="auth-section">
                 <button className="btn btn-primary"> + </button>
 
-                <button className="btn btn-secondary">
-                  {" "}
-                  Notas compartidas{" "}
-                </button>
+                <button className="btn btn-secondary">Notas compartidas</button>
               </div>
             </div>
             <ListCard data={data} />
@@ -48,6 +46,8 @@ export default function Home() {
         ) : (
           <p>Usuarios. No implementado todavia</p>
         )}
+
+        <Modal />
       </main>
     </>
   );
