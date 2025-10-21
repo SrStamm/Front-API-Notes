@@ -1,9 +1,23 @@
-function Modal() {
+type ModalProps = {
+  modalVisible: boolean;
+  setModalVisible: (visible: boolean) => void;
+};
+
+function Modal({ modalVisible, setModalVisible }: ModalProps) {
   return (
-    <div className="modal-backdrop ">
+    <div
+      className={
+        modalVisible === true ? "modal-backdrop show" : "modal-backdrop"
+      }
+    >
       <div className="form-container modal">
         <div className="modal-header">
-          <button className="modal-close">X</button>
+          <button
+            onClick={() => setModalVisible(false)}
+            className="modal-close"
+          >
+            X
+          </button>
           <h2 className="form-title">Nueva nota</h2>
         </div>
         <form className="form">
@@ -16,7 +30,7 @@ function Modal() {
           </div>
           <div className="form-group">
             <select required>
-              <option value="" disabled selected>
+              <option disabled selected>
                 Seleccione una categoría
               </option>
               <option value="work">Trabajo</option>
@@ -34,7 +48,11 @@ function Modal() {
             <button type="button" className="btn btn-primary">
               Guardar
             </button>
-            <button type="button" className="btn btn-warning">
+            <button
+              onClick={() => setModalVisible(false)}
+              type="button"
+              className="btn btn-warning"
+            >
               Cancelar
             </button>
           </div>
