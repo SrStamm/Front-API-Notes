@@ -1,4 +1,5 @@
 export interface cardDataInterface {
+  id: number;
   text: string;
   category: string;
   tag: string;
