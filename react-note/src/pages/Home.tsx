@@ -50,7 +50,29 @@ export default function Home() {
   }, [getNotes]);
 
   const addNoteList = (newNote: cardDataInterface) => {
-    setListCards((prevCards) => [newNote, ...prevCards]);
+    setListCards((prevCards) => [...prevCards, newNote]);
+  };
+
+  const deleteNoteHandler = async (noteId: number) => {
+    try {
+      const response = await Fetch({
+        path: `notes/${noteId}`,
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setListCards((prevCards) =>
+          prevCards.filter((card) => card.id !== noteId),
+        );
+      } else if (response.status === 401) {
+        handleInvalidToken();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail);
+      }
+    } catch (error) {
+      console.error("Fallo al eliminar la nota:", error);
+    }
   };
 
   // Props para el modal
@@ -85,7 +107,7 @@ export default function Home() {
                 <button className="btn btn-secondary">Notas compartidas</button>
               </div>
             </div>
-            <ListCard listCards={listCards} />
+            <ListCard listCards={listCards} onDeleteNote={deleteNoteHandler} />
           </>
         ) : (
           <p>Usuarios. No implementado todavia</p>

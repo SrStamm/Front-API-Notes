@@ -8,9 +8,10 @@ export interface cardDataInterface {
 
 interface CardProps {
   data: cardDataInterface;
+  onDeleteNote: (noteId: number) => void;
 }
 
-function Card({ data }: CardProps) {
+function Card({ data, onDeleteNote }: CardProps) {
   return (
     <div>
       <div className="card">
@@ -29,7 +30,11 @@ function Card({ data }: CardProps) {
           <button type="button" className="btn btn-primary editBtn">
             Editar
           </button>
-          <button type="button" className="btn btn-danger deleteBtn">
+          <button
+            onClick={() => onDeleteNote(data.id)}
+            type="button"
+            className="btn btn-danger deleteBtn"
+          >
             Eliminar
           </button>
           <button type="button" className="btn btn-success shareBtn">
