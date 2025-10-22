@@ -1,10 +1,12 @@
 import type React from "react";
 import { useState } from "react";
 import Fetch from "../utils/api";
+import type { cardDataInterface } from "./Card";
 
 type ModalProps = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
+  onNoteCreated: (note: cardDataInterface) => void;
 };
 
 type NewNote = {
@@ -13,7 +15,7 @@ type NewNote = {
   category: string;
 };
 
-function Modal({ modalVisible, setModalVisible }: ModalProps) {
+function Modal({ modalVisible, setModalVisible, onNoteCreated }: ModalProps) {
   const [text, setText] = useState("");
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
@@ -55,7 +57,8 @@ function Modal({ modalVisible, setModalVisible }: ModalProps) {
 
       if (response.ok) {
         const responseData = await response.json();
-        console.log("Detail: ", responseData.detail);
+
+        onNoteCreated(responseData.new_note);
 
         setModalVisible(false);
       } else {
