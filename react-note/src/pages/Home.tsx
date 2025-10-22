@@ -3,22 +3,6 @@ import Header from "../modules/Header";
 import ListCard from "../modules/ListCard";
 import Modal from "../modules/Modal";
 
-const data = [
-  {
-    text: "Esto es una nota",
-    category: "category",
-    tag: "tag",
-    date: "12/12",
-  },
-
-  {
-    text: "Hola mundo",
-    category: "category",
-    tag: "tag",
-    date: "19/9",
-  },
-];
-
 export default function Home() {
   const [currentView, setCurrentView] = useState("notes");
 
@@ -54,7 +38,7 @@ export default function Home() {
                 <button className="btn btn-secondary">Notas compartidas</button>
               </div>
             </div>
-            <ListCard data={data} />
+            <ListCard />
           </>
         ) : (
           <p>Usuarios. No implementado todavia</p>

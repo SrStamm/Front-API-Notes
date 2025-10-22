@@ -56,6 +56,7 @@ function Modal({ modalVisible, setModalVisible }: ModalProps) {
       if (response.ok) {
         const responseData = await response.json();
         console.log("Detail: ", responseData.detail);
+
         setModalVisible(false);
       } else {
         console.error("Error al crear la nota");
