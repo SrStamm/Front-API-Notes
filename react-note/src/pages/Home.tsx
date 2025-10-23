@@ -7,18 +7,20 @@ import type { cardDataInterface } from "../modules/Card";
 import Fetch from "../utils/api";
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState("notes");
-  const [modalVisible, setModalVisible] = useState(false);
-
-  // Estado de la lista de notas
-  // Y manejo de las mismas
-  const [listCards, setListCards] = useState<cardDataInterface[]>([]);
   const navigate = useNavigate();
 
   const handleInvalidToken = useCallback(() => {
     localStorage.removeItem("auth_token");
     navigate("/login");
   }, [navigate]);
+
+  const [currentView, setCurrentView] = useState("notes");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [noteToEdit, setNoteToEdit] = useState<cardDataInterface | null>(null);
+
+  // Estado de la lista de notas
+  // Y manejo de las mismas
+  const [listCards, setListCards] = useState<cardDataInterface[]>([]);
 
   const getNotes = useCallback(async (): Promise<cardDataInterface[]> => {
     try {
@@ -75,11 +77,29 @@ export default function Home() {
     }
   };
 
+  const handleEditRequest = (note: cardDataInterface) => {
+    setNoteToEdit(note);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setNoteToEdit(null);
+  };
+
+  const updateNoteList = (updateNote: cardDataInterface) => {
+    setListCards((prevCards) =>
+      prevCards.map((card) => (card.id === updateNote.id ? updateNote : card)),
+    );
+  };
+
   // Props para el modal
   const modalProps = {
     modalVisible: modalVisible,
     setModalVisible: setModalVisible,
     onNoteCreated: addNoteList,
+    onNoteUpdated: updateNoteList,
+    noteToEdit: noteToEdit,
   };
 
   const props = {
@@ -100,14 +120,17 @@ export default function Home() {
                   onClick={() => setModalVisible(true)}
                   className="btn btn-primary"
                 >
-                  {" "}
-                  +{" "}
+                  +
                 </button>
 
                 <button className="btn btn-secondary">Notas compartidas</button>
               </div>
             </div>
-            <ListCard listCards={listCards} onDeleteNote={deleteNoteHandler} />
+            <ListCard
+              listCards={listCards}
+              onDeleteNote={deleteNoteHandler}
+              onEditNote={handleEditRequest}
+            />
           </>
         ) : (
           <p>Usuarios. No implementado todavia</p>

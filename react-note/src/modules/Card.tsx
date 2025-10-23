@@ -9,9 +9,10 @@ export interface cardDataInterface {
 interface CardProps {
   data: cardDataInterface;
   onDeleteNote: (noteId: number) => void;
+  onEditNote: (editCard: cardDataInterface) => void;
 }
 
-function Card({ data, onDeleteNote }: CardProps) {
+function Card({ data, onDeleteNote, onEditNote }: CardProps) {
   return (
     <div>
       <div className="card">
@@ -27,7 +28,11 @@ function Card({ data, onDeleteNote }: CardProps) {
           {data.tag}
         </div>
         <div className="card-actions">
-          <button type="button" className="btn btn-primary editBtn">
+          <button
+            onClick={() => onEditNote(data)}
+            type="button"
+            className="btn btn-primary editBtn"
+          >
             Editar
           </button>
           <button

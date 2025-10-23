@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Fetch from "../utils/api";
 import type { cardDataInterface } from "./Card";
 
@@ -7,18 +7,39 @@ type ModalProps = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
   onNoteCreated: (note: cardDataInterface) => void;
+  onNoteUpdated: (note: cardDataInterface) => void;
+  noteToEdit: cardDataInterface | null;
 };
 
 type NewNote = {
+  id?: number;
   text: string;
   tags: string[];
   category: string;
 };
 
-function Modal({ modalVisible, setModalVisible, onNoteCreated }: ModalProps) {
+function Modal({
+  modalVisible,
+  setModalVisible,
+  onNoteCreated,
+  onNoteUpdated,
+  noteToEdit,
+}: ModalProps) {
   const [text, setText] = useState("");
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
+
+  useEffect(() => {
+    if (noteToEdit) {
+      setText(noteToEdit.text);
+      setCategory(noteToEdit.category);
+      setTags(noteToEdit.tag || "");
+    } else {
+      setText("");
+      setCategory("");
+      setTags("");
+    }
+  }, [noteToEdit]);
 
   const textChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -46,19 +67,28 @@ function Modal({ modalVisible, setModalVisible, onNoteCreated }: ModalProps) {
       tags: tagsArray,
     };
 
-    console.log(NoteData);
+    const mode = noteToEdit ? "EDIT" : "CREATE";
+
+    const path = mode === "CREATE" ? "notes/" : `notes/${noteToEdit?.id}`;
+    const method = mode === "CREATE" ? "POST" : "PATCH";
 
     try {
       const response = await Fetch({
-        path: "notes/",
-        method: "POST",
+        path: path,
+        method: method,
         body: NoteData,
       });
 
       if (response.ok) {
         const responseData = await response.json();
 
-        onNoteCreated(responseData.new_note);
+        console.log(responseData);
+
+        if (mode === "CREATE") {
+          onNoteCreated(responseData.new_note); // Notifica la creación
+        } else {
+          onNoteUpdated(responseData.updated_note); // Notifica la actualización
+        }
 
         setModalVisible(false);
       } else {
