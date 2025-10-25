@@ -82,8 +82,6 @@ function Modal({
       if (response.ok) {
         const responseData = await response.json();
 
-        console.log(responseData);
-
         if (mode === "CREATE") {
           onNoteCreated(responseData.new_note); // Notifica la creación
         } else {
@@ -97,9 +95,13 @@ function Modal({
         throw new Error(responseError.detail);
       }
     } catch (error) {
-      console.log("Error: ", error);
+      console.error("Error: ", error);
     }
   };
+
+  const mode = noteToEdit ? "EDIT" : "CREATE";
+
+  const formTitle = mode === "CREATE" ? "Nueva nota" : "Editar nota";
 
   return (
     <div
@@ -115,7 +117,7 @@ function Modal({
           >
             X
           </button>
-          <h2 className="form-title">Nueva nota</h2>
+          <h2 className="form-title"> {formTitle} </h2>
         </div>
         <form className="form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -151,7 +153,7 @@ function Modal({
             <button
               onClick={() => setModalVisible(false)}
               type="button"
-              className="btn btn-warning"
+              className="btn btn-danger"
             >
               Cancelar
             </button>

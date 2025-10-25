@@ -31,7 +31,6 @@ export default function Home() {
 
       if (response.ok) {
         const cards = await response.json();
-        console.log("Cards: ", cards);
         setListCards(cards);
         return cards;
       } else if (response.status === 401) {
@@ -80,11 +79,6 @@ export default function Home() {
   const handleEditRequest = (note: cardDataInterface) => {
     setNoteToEdit(note);
     setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setNoteToEdit(null);
   };
 
   const updateNoteList = (updateNote: cardDataInterface) => {
