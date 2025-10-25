@@ -50,7 +50,7 @@ function RegisterForm() {
         console.error("Error:", dataError.detail);
       }
     } catch (error) {
-      console.log("Error inesperado al crear el usuario", error);
+      console.error("Error inesperado al crear el usuario", error);
     }
   };
 
