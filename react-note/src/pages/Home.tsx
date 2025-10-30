@@ -8,6 +8,9 @@ import {
   fetchDeletePersonalNote,
   fetchPersonalNotes,
 } from "../services/notesService";
+import ListUsers, { type userDataInterface } from "../modules/TableUsers";
+import TableUser from "../modules/TableUsers";
+import Fetch from "../utils/api";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -147,6 +150,36 @@ export default function Home() {
       </>
     );
 
+  const [listUsers, setListUsers] = useState<userDataInterface[]>([]);
+
+  const getUsers = useCallback(async (): Promise<userDataInterface[]> => {
+    try {
+      const response = await Fetch({
+        path: "users/all-users/",
+        method: "GET",
+      });
+
+      if (response.ok) {
+        const users = await response.json();
+        setListUsers(users);
+        return users;
+      } else if (response.status === 401) {
+        handleInvalidToken();
+        return [];
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail);
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+      return [];
+    }
+  }, [handleInvalidToken, setListUsers]);
+
+  useEffect(() => {
+    getUsers();
+  }, [getUsers]);
+
   return (
     <>
       <Header {...props} />
@@ -154,7 +187,7 @@ export default function Home() {
         {currentView === "notes" ? (
           renderNotes
         ) : (
-          <p>Usuarios. No implementado todavia</p>
+          <TableUser listUser={listUsers} />
         )}
 
         {modalVisible && <Modal {...modalProps} />}
