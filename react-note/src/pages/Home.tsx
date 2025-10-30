@@ -15,8 +15,13 @@ export default function Home() {
   }, [navigate]);
 
   const [currentView, setCurrentView] = useState("notes");
+  const [typeNotes, setTypeNotes] = useState("personal");
   const [modalVisible, setModalVisible] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState<cardDataInterface | null>(null);
+
+  const handleViewNotes = (type: string) => {
+    setTypeNotes(type);
+  };
 
   // Estado de la lista de notas
   // Y manejo de las mismas
@@ -101,31 +106,60 @@ export default function Home() {
     setCurrentView: setCurrentView,
   };
 
+  const renderNotes =
+    typeNotes === "personal" ? (
+      <>
+        <div className="section-header">
+          <h2>Mis notas</h2>
+          <div className="auth-section">
+            <button
+              onClick={() => setModalVisible(true)}
+              className="btn btn-primary"
+            >
+              +
+            </button>
+
+            <button
+              onClick={() => setTypeNotes("shared")}
+              className="btn btn-secondary"
+            >
+              Notas compartidas
+            </button>
+          </div>
+        </div>
+        <ListCard
+          listCards={listCards}
+          onDeleteNote={deleteNoteHandler}
+          onEditNote={handleEditRequest}
+        />
+      </>
+    ) : (
+      <>
+        <div className="section-header">
+          <h2>Notas compartidas</h2>
+          <div className="auth-section">
+            <button
+              onClick={() => setTypeNotes("personal")}
+              className="btn btn-secondary"
+            >
+              Mis Notas
+            </button>
+          </div>
+        </div>
+        <ListCard
+          listCards={listCards}
+          onDeleteNote={deleteNoteHandler}
+          onEditNote={handleEditRequest}
+        />
+      </>
+    );
+
   return (
     <>
       <Header {...props} />
       <main className="container">
         {currentView === "notes" ? (
-          <>
-            <div className="section-header">
-              <h2>Mis notas</h2>
-              <div className="auth-section">
-                <button
-                  onClick={() => setModalVisible(true)}
-                  className="btn btn-primary"
-                >
-                  +
-                </button>
-
-                <button className="btn btn-secondary">Notas compartidas</button>
-              </div>
-            </div>
-            <ListCard
-              listCards={listCards}
-              onDeleteNote={deleteNoteHandler}
-              onEditNote={handleEditRequest}
-            />
-          </>
+          renderNotes
         ) : (
           <p>Usuarios. No implementado todavia</p>
         )}
