@@ -13,3 +13,10 @@ export async function fetchDeletePersonalNote(noteId: number) {
     method: "DELETE",
   });
 }
+
+export async function fetchSharedNotes() {
+  return await Fetch({
+    path: "notes/shared/",
+    method: "GET",
+  });
+}
