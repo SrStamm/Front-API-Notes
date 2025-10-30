@@ -102,6 +102,29 @@ function UserInfo() {
     }
   };
 
+  const deactivateSession = async (sessionId: string) => {
+    try {
+      const response = await Fetch({
+        path: `sessions/${sessionId}`,
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        console.log(`Cerrada la sesión ${sessionId}`);
+        handleInvalidToken();
+        return;
+      } else if (response.status === 401) {
+        handleInvalidToken();
+        return;
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail);
+      }
+    } catch (error) {
+      console.error("Error al cerrar la sesión: ", error);
+    }
+  };
+
   return (
     <section className="section">
       <div className="section-header">
@@ -120,6 +143,7 @@ function UserInfo() {
             <tr>
               <th>ID</th>
               <th>Activo</th>
+              <th></th>
             </tr>
           </thead>
 
@@ -128,13 +152,24 @@ function UserInfo() {
               <tr key={session.session_id}>
                 <td>{session.session_id}</td>
                 {session.is_active === true ? (
-                  <td style={{ color: "green" }}>Activo </td>
+                  <>
+                    <td style={{ color: "green" }}>Activo </td>
+
+                    <td>
+                      <button
+                        onClick={() => deactivateSession(session.session_id)}
+                        className="btn btn-warning"
+                      >
+                        Cerrar sesión
+                      </button>
+                    </td>
+                  </>
                 ) : (
-                  <td style={{ color: "red" }}>Inactivo </td>
+                  <>
+                    <td style={{ color: "red" }}>Inactivo </td>
+                    <td></td>
+                  </>
                 )}
-                <td>
-                  <button>Cerrar sesión</button>
-                </td>
               </tr>
             ))}
           </tbody>
