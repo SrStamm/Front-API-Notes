@@ -7,8 +7,9 @@ import type { cardDataInterface } from "../modules/Card";
 import {
   fetchDeletePersonalNote,
   fetchPersonalNotes,
+  fetchSharedNotes,
 } from "../services/notesService";
-import ListUsers, { type userDataInterface } from "../modules/TableUsers";
+import { type userDataInterface } from "../modules/TableUsers";
 import TableUser from "../modules/TableUsers";
 import Fetch from "../utils/api";
 
@@ -28,6 +29,12 @@ export default function Home() {
   // Estado de la lista de notas
   // Y manejo de las mismas
   const [listCards, setListCards] = useState<cardDataInterface[]>([]);
+
+  //
+  //
+  // Personal notes
+  //
+  //
 
   const getNotes = useCallback(async (): Promise<cardDataInterface[]> => {
     try {
@@ -102,6 +109,42 @@ export default function Home() {
     setCurrentView: setCurrentView,
   };
 
+  //
+  //
+  // Shared Notes
+  //
+  //
+
+  const [listSharedNotes, setListSharedNotes] = useState<cardDataInterface[]>(
+    [],
+  );
+
+  const getSharedNotes = useCallback(async (): Promise<cardDataInterface[]> => {
+    try {
+      const response = await fetchSharedNotes();
+
+      if (response.ok) {
+        const notes = await response.json();
+        setListSharedNotes(notes);
+        return notes;
+      } else if (response.status === 401) {
+        handleInvalidToken();
+        return [];
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail);
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+      return [];
+    }
+  }, [handleInvalidToken, setListSharedNotes]);
+
+  //
+  //
+  //
+  //
+
   const renderNotes =
     typeNotes === "personal" ? (
       <>
@@ -142,13 +185,24 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <ListCard
-          listCards={listCards}
-          onDeleteNote={deleteNoteHandler}
-          onEditNote={handleEditRequest}
-        />
+
+        {listSharedNotes.length > 0 ? (
+          <ListCard
+            listCards={listSharedNotes}
+            onDeleteNote={deleteNoteHandler}
+            onEditNote={handleEditRequest}
+          />
+        ) : (
+          <h3>Nadie compartió notas contigo</h3>
+        )}
       </>
     );
+
+  //
+  //
+  // Users
+  //
+  //
 
   const [listUsers, setListUsers] = useState<userDataInterface[]>([]);
 
