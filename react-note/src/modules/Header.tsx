@@ -40,21 +40,54 @@ function Header({ currentView, setCurrentView }: Props) {
         <h1>Gestor de Notas</h1>
         <div className="auth-section">
           {currentView === "notes" ? (
-            <button
-              onClick={() => setCurrentView("users")}
-              className="btn btn-primary"
-            >
-              Usuarios{" "}
-            </button>
+            <>
+              <button
+                onClick={() => setCurrentView("users")}
+                className="btn btn-secondary"
+              >
+                Usuarios
+              </button>
+
+              <button
+                onClick={() => setCurrentView("perfil")}
+                className="btn btn-success"
+              >
+                Mi perfil
+              </button>
+            </>
+          ) : currentView === "users" ? (
+            <>
+              <button
+                onClick={() => setCurrentView("notes")}
+                className="btn btn-primary"
+              >
+                Mis notas
+              </button>
+
+              <button
+                onClick={() => setCurrentView("perfil")}
+                className="btn btn-success"
+              >
+                Mi perfil
+              </button>
+            </>
           ) : (
-            <button
-              onClick={() => setCurrentView("notes")}
-              className="btn btn-primary"
-            >
-              Mis notas{" "}
-            </button>
+            <>
+              <button
+                onClick={() => setCurrentView("notes")}
+                className="btn btn-primary"
+              >
+                Mis notas
+              </button>
+
+              <button
+                onClick={() => setCurrentView("users")}
+                className="btn btn-secondary"
+              >
+                Usuarios
+              </button>
+            </>
           )}
-          <button className="btn btn-success">Mi perfil</button>
           <button onClick={closeSession} className="btn btn-danger">
             Cerrar Sesión
           </button>

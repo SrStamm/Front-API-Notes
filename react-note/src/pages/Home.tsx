@@ -8,9 +8,10 @@ import {
   fetchDeletePersonalNote,
   fetchPersonalNotes,
 } from "../services/notesService";
-import ListUsers, { type userDataInterface } from "../modules/TableUsers";
+import { type userDataInterface } from "../modules/TableUsers";
 import TableUser from "../modules/TableUsers";
 import Fetch from "../utils/api";
+import UserInfo from "../modules/UserInfo";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export default function Home() {
         const cards = await response.json();
         setListCards(cards);
         return cards;
-      } else if (response.status === 401) {
+      } else if (response.status === 401 || response.status === 404) {
         handleInvalidToken();
         return [];
       } else {
@@ -186,8 +187,10 @@ export default function Home() {
       <main className="container">
         {currentView === "notes" ? (
           renderNotes
-        ) : (
+        ) : currentView === "users" ? (
           <TableUser listUser={listUsers} />
+        ) : (
+          <UserInfo />
         )}
 
         {modalVisible && <Modal {...modalProps} />}
