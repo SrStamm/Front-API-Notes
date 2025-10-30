@@ -79,6 +79,29 @@ function UserInfo() {
     getCurrentUserInfo();
   }, [getSession, getCurrentUserInfo]);
 
+  const deactivateAllSession = async () => {
+    try {
+      const response = await Fetch({
+        path: "sessions/all-sessions",
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        console.log("Cerradas todas las sesiones");
+        handleInvalidToken();
+        return;
+      } else if (response.status === 401) {
+        handleInvalidToken();
+        return;
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail);
+      }
+    } catch (error) {
+      console.error("Error al cerrar las sesiones: ", error);
+    }
+  };
+
   return (
     <section className="section">
       <div className="section-header">
@@ -105,17 +128,25 @@ function UserInfo() {
               <tr key={session.session_id}>
                 <td>{session.session_id}</td>
                 {session.is_active === true ? (
-                  <td> Activo </td>
+                  <td style={{ color: "green" }}>Activo </td>
                 ) : (
-                  <td> Inactivo </td>
+                  <td style={{ color: "red" }}>Inactivo </td>
                 )}
+                <td>
+                  <button>Cerrar sesión</button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <div>
-        <button className="btn btn-danger"> Cerrrar todas las sesiones</button>
+        <button
+          onClick={() => deactivateAllSession()}
+          className="btn btn-danger"
+        >
+          Cerrrar todas las sesiones
+        </button>
       </div>
     </section>
   );
