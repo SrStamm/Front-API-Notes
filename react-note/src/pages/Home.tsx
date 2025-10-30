@@ -38,7 +38,7 @@ export default function Home() {
         const cards = await response.json();
         setListCards(cards);
         return cards;
-      } else if (response.status === 401) {
+      } else if (response.status === 401 || response.status === 404) {
         handleInvalidToken();
         return [];
       } else {
