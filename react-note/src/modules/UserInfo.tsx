@@ -79,6 +79,14 @@ function UserInfo() {
     getCurrentUserInfo();
   }, [getSession, getCurrentUserInfo]);
 
+  const updateSession = (updateSession: sessionData) => {
+    setCurrentInfo((prevSession) =>
+      prevSession.map((sesion) =>
+        sesion.session_id === updateSession.session_id ? updateSession : sesion,
+      ),
+    );
+  };
+
   const deactivateAllSession = async () => {
     try {
       const response = await Fetch({
@@ -102,16 +110,18 @@ function UserInfo() {
     }
   };
 
-  const deactivateSession = async (sessionId: string) => {
+  const deactivateSession = async (session: sessionData) => {
     try {
       const response = await Fetch({
-        path: `sessions/${sessionId}`,
+        path: `sessions/${session.session_id}`,
         method: "DELETE",
       });
 
       if (response.ok) {
-        console.log(`Cerrada la sesión ${sessionId}`);
-        handleInvalidToken();
+        console.log(`Cerrada la sesión ${session.session_id}`);
+
+        session.is_active = false;
+        updateSession(session);
         return;
       } else if (response.status === 401) {
         handleInvalidToken();
@@ -157,7 +167,7 @@ function UserInfo() {
 
                     <td>
                       <button
-                        onClick={() => deactivateSession(session.session_id)}
+                        onClick={() => deactivateSession(session)}
                         className="btn btn-warning"
                       >
                         Cerrar sesión
