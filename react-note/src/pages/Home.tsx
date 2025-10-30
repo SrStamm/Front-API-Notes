@@ -4,7 +4,10 @@ import ListCard from "../modules/ListCard";
 import Modal from "../modules/Modal";
 import { useNavigate } from "react-router-dom";
 import type { cardDataInterface } from "../modules/Card";
-import Fetch from "../utils/api";
+import {
+  fetchDeletePersonalNote,
+  fetchPersonalNotes,
+} from "../services/notesService";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -19,20 +22,13 @@ export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState<cardDataInterface | null>(null);
 
-  const handleViewNotes = (type: string) => {
-    setTypeNotes(type);
-  };
-
   // Estado de la lista de notas
   // Y manejo de las mismas
   const [listCards, setListCards] = useState<cardDataInterface[]>([]);
 
   const getNotes = useCallback(async (): Promise<cardDataInterface[]> => {
     try {
-      const response = await Fetch({
-        path: "notes/personal/",
-        method: "GET",
-      });
+      const response = await fetchPersonalNotes();
 
       if (response.ok) {
         const cards = await response.json();
@@ -61,10 +57,7 @@ export default function Home() {
 
   const deleteNoteHandler = async (noteId: number) => {
     try {
-      const response = await Fetch({
-        path: `notes/${noteId}`,
-        method: "DELETE",
-      });
+      const response = await fetchDeletePersonalNote(noteId);
 
       if (response.ok) {
         setListCards((prevCards) =>
