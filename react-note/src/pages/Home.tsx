@@ -8,6 +8,7 @@ import {
   fetchDeletePersonalNote,
   fetchPersonalNotes,
   fetchSharedNotes,
+  fetchShareNote,
 } from "../services/notesService";
 import { type userDataInterface } from "../modules/TableUsers";
 import TableUser from "../modules/TableUsers";
@@ -26,6 +27,8 @@ export default function Home() {
   const [typeNotes, setTypeNotes] = useState("personal");
   const [modalVisible, setModalVisible] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState<cardDataInterface | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [noteToShare, setNoteToShare] = useState(0);
 
   // Estado de la lista de notas
   // Y manejo de las mismas
@@ -85,6 +88,7 @@ export default function Home() {
     }
   };
 
+
   const handleEditRequest = (note: cardDataInterface) => {
     setNoteToEdit(note);
     setModalVisible(true);
@@ -94,6 +98,29 @@ export default function Home() {
     setNoteToEdit(null);
     setModalVisible(true);
   };
+
+  const handleShareRequest = (noteId: number) => {
+    setNoteToShare(noteId);
+    setIsSharing(true);
+    setCurrentView("share-notes")
+  };
+
+  const handleShareUser = async (userId: number) => {
+    try {
+      const response = await fetchShareNote(userId, noteToShare);
+
+      if (response.ok) {
+        console.log("Nota compartida con éxito")
+      } else if (response.status === 401) {
+        handleInvalidToken();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail);
+      }
+    } catch (error) {
+      console.error("Fallo al compartir la nota:", error);
+    }
+  }
 
   const updateNoteList = (updateNote: cardDataInterface) => {
     setListCards((prevCards) =>
@@ -176,6 +203,7 @@ export default function Home() {
           listCards={listCards}
           onDeleteNote={deleteNoteHandler}
           onEditNote={handleEditRequest}
+          onShareNote={handleShareRequest}
         />
       </>
     ) : (
@@ -246,8 +274,10 @@ export default function Home() {
       <main className="container">
         {currentView === "notes" ? (
           renderNotes
+        ) : currentView === "share-notes" ? (
+          <TableUser listUser={listUsers} toShare={true} onShareUser={handleShareUser} />
         ) : currentView === "users" ? (
-          <TableUser listUser={listUsers} />
+          <TableUser listUser={listUsers} toShare={false} onShareUser={handleShareUser}/>
         ) : (
           <UserInfo />
         )}

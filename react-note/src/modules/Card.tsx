@@ -10,9 +10,10 @@ interface CardProps {
   data: cardDataInterface;
   onDeleteNote: (noteId: number) => void;
   onEditNote: (editCard: cardDataInterface) => void;
+  onShareNote: (noteId: number) => void;
 }
 
-function Card({ data, onDeleteNote, onEditNote }: CardProps) {
+function Card({ data, onDeleteNote, onEditNote, onShareNote }: CardProps) {
   return (
     <div>
       <div className="card">
@@ -42,7 +43,11 @@ function Card({ data, onDeleteNote, onEditNote }: CardProps) {
           >
             Eliminar
           </button>
-          <button type="button" className="btn btn-success shareBtn">
+          <button
+            onClick={() => onShareNote(data.id)}
+            type="button"
+            className="btn btn-success shareBtn"
+          >
             Compartir
           </button>
         </div>
