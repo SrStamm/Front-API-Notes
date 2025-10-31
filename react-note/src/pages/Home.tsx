@@ -3,7 +3,7 @@ import Header from "../modules/Header";
 import ListCard from "../modules/ListCard";
 import Modal from "../modules/Modal";
 import { useNavigate } from "react-router-dom";
-import type { cardDataInterface } from "../modules/Card";
+import type { cardDataInterface, sharedDataInterface } from "../modules/Card";
 import {
   fetchDeletePersonalNote,
   fetchPersonalNotes,
@@ -88,7 +88,6 @@ export default function Home() {
     }
   };
 
-
   const handleEditRequest = (note: cardDataInterface) => {
     setNoteToEdit(note);
     setModalVisible(true);
@@ -102,7 +101,7 @@ export default function Home() {
   const handleShareRequest = (noteId: number) => {
     setNoteToShare(noteId);
     setIsSharing(true);
-    setCurrentView("share-notes")
+    setCurrentView("share-notes");
   };
 
   const handleShareUser = async (userId: number) => {
@@ -110,7 +109,7 @@ export default function Home() {
       const response = await fetchShareNote(userId, noteToShare);
 
       if (response.ok) {
-        console.log("Nota compartida con éxito")
+        console.log("Nota compartida con éxito");
       } else if (response.status === 401) {
         handleInvalidToken();
       } else {
@@ -120,7 +119,7 @@ export default function Home() {
     } catch (error) {
       console.error("Fallo al compartir la nota:", error);
     }
-  }
+  };
 
   const updateNoteList = (updateNote: cardDataInterface) => {
     setListCards((prevCards) =>
@@ -157,9 +156,21 @@ export default function Home() {
       const response = await fetchSharedNotes();
 
       if (response.ok) {
-        const notes = await response.json();
-        setListSharedNotes(notes);
-        return notes;
+        const notes: sharedDataInterface[] = await response.json();
+        const list: cardDataInterface[] = [];
+
+        notes.map((note) => {
+          const sharedNote: cardDataInterface = {
+            id: note.note_id,
+            text: note.text,
+            category: note.category,
+          };
+
+          list.push(...list, sharedNote);
+        });
+
+        setListSharedNotes(list);
+        return list;
       } else if (response.status === 401) {
         handleInvalidToken();
         return [];
@@ -172,6 +183,10 @@ export default function Home() {
       return [];
     }
   }, [handleInvalidToken, setListSharedNotes]);
+
+  useEffect(() => {
+    getSharedNotes();
+  }, [getSharedNotes]);
 
   //
   //
@@ -225,6 +240,7 @@ export default function Home() {
             listCards={listSharedNotes}
             onDeleteNote={deleteNoteHandler}
             onEditNote={handleEditRequest}
+            onShareNote={handleShareRequest}
           />
         ) : (
           <h3>Nadie compartió notas contigo</h3>
@@ -275,9 +291,17 @@ export default function Home() {
         {currentView === "notes" ? (
           renderNotes
         ) : currentView === "share-notes" ? (
-          <TableUser listUser={listUsers} toShare={true} onShareUser={handleShareUser} />
+          <TableUser
+            listUser={listUsers}
+            toShare={true}
+            onShareUser={handleShareUser}
+          />
         ) : currentView === "users" ? (
-          <TableUser listUser={listUsers} toShare={false} onShareUser={handleShareUser}/>
+          <TableUser
+            listUser={listUsers}
+            toShare={false}
+            onShareUser={handleShareUser}
+          />
         ) : (
           <UserInfo />
         )}

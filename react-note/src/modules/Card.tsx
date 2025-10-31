@@ -6,6 +6,13 @@ export interface cardDataInterface {
   date: string;
 }
 
+export interface sharedDataInterface {
+    note_id: number,
+    text: string,
+    category: string,
+    original_user_id: number
+}
+
 interface CardProps {
   data: cardDataInterface;
   onDeleteNote: (noteId: number) => void;
