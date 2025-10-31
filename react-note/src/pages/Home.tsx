@@ -90,6 +90,11 @@ export default function Home() {
     setModalVisible(true);
   };
 
+  const handleCreateRequest = () => {
+    setNoteToEdit(null);
+    setModalVisible(true);
+  };
+
   const updateNoteList = (updateNote: cardDataInterface) => {
     setListCards((prevCards) =>
       prevCards.map((card) => (card.id === updateNote.id ? updateNote : card)),
@@ -153,7 +158,7 @@ export default function Home() {
           <h2>Mis notas</h2>
           <div className="auth-section">
             <button
-              onClick={() => setModalVisible(true)}
+              onClick={() => handleCreateRequest()}
               className="btn btn-primary"
             >
               +
