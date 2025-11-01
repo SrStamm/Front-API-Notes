@@ -3,11 +3,12 @@ import Header from "../modules/Header";
 import ListCard from "../modules/ListCard";
 import Modal from "../modules/Modal";
 import { useNavigate } from "react-router-dom";
-import type { cardDataInterface } from "../modules/Card";
+import type { cardDataInterface, sharedDataInterface } from "../modules/Card";
 import {
   fetchDeletePersonalNote,
   fetchPersonalNotes,
   fetchSharedNotes,
+  fetchShareNote,
 } from "../services/notesService";
 import { type userDataInterface } from "../modules/TableUsers";
 import TableUser from "../modules/TableUsers";
@@ -26,6 +27,8 @@ export default function Home() {
   const [typeNotes, setTypeNotes] = useState("personal");
   const [modalVisible, setModalVisible] = useState(false);
   const [noteToEdit, setNoteToEdit] = useState<cardDataInterface | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [noteToShare, setNoteToShare] = useState(0);
 
   // Estado de la lista de notas
   // Y manejo de las mismas
@@ -95,6 +98,29 @@ export default function Home() {
     setModalVisible(true);
   };
 
+  const handleShareRequest = (noteId: number) => {
+    setNoteToShare(noteId);
+    setIsSharing(true);
+    setCurrentView("share-notes");
+  };
+
+  const handleShareUser = async (userId: number) => {
+    try {
+      const response = await fetchShareNote(userId, noteToShare);
+
+      if (response.ok) {
+        console.log("Nota compartida con éxito");
+      } else if (response.status === 401) {
+        handleInvalidToken();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail);
+      }
+    } catch (error) {
+      console.error("Fallo al compartir la nota:", error);
+    }
+  };
+
   const updateNoteList = (updateNote: cardDataInterface) => {
     setListCards((prevCards) =>
       prevCards.map((card) => (card.id === updateNote.id ? updateNote : card)),
@@ -130,9 +156,21 @@ export default function Home() {
       const response = await fetchSharedNotes();
 
       if (response.ok) {
-        const notes = await response.json();
-        setListSharedNotes(notes);
-        return notes;
+        const notes: sharedDataInterface[] = await response.json();
+        const list: cardDataInterface[] = [];
+
+        notes.map((note) => {
+          const sharedNote: cardDataInterface = {
+            id: note.note_id,
+            text: note.text,
+            category: note.category,
+          };
+
+          list.push(...list, sharedNote);
+        });
+
+        setListSharedNotes(list);
+        return list;
       } else if (response.status === 401) {
         handleInvalidToken();
         return [];
@@ -145,6 +183,10 @@ export default function Home() {
       return [];
     }
   }, [handleInvalidToken, setListSharedNotes]);
+
+  useEffect(() => {
+    getSharedNotes();
+  }, [getSharedNotes]);
 
   //
   //
@@ -176,6 +218,8 @@ export default function Home() {
           listCards={listCards}
           onDeleteNote={deleteNoteHandler}
           onEditNote={handleEditRequest}
+          onShareNote={handleShareRequest}
+          isSharedNotes={false}
         />
       </>
     ) : (
@@ -197,6 +241,8 @@ export default function Home() {
             listCards={listSharedNotes}
             onDeleteNote={deleteNoteHandler}
             onEditNote={handleEditRequest}
+            onShareNote={handleShareRequest}
+            isSharedNotes={true}
           />
         ) : (
           <h3>Nadie compartió notas contigo</h3>
@@ -246,8 +292,18 @@ export default function Home() {
       <main className="container">
         {currentView === "notes" ? (
           renderNotes
+        ) : currentView === "share-notes" ? (
+          <TableUser
+            listUser={listUsers}
+            toShare={true}
+            onShareUser={handleShareUser}
+          />
         ) : currentView === "users" ? (
-          <TableUser listUser={listUsers} />
+          <TableUser
+            listUser={listUsers}
+            toShare={false}
+            onShareUser={handleShareUser}
+          />
         ) : (
           <UserInfo />
         )}

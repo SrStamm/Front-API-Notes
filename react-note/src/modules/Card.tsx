@@ -6,13 +6,22 @@ export interface cardDataInterface {
   date: string;
 }
 
+export interface sharedDataInterface {
+    note_id: number,
+    text: string,
+    category: string,
+    original_user_id: number
+}
+
 interface CardProps {
   data: cardDataInterface;
   onDeleteNote: (noteId: number) => void;
   onEditNote: (editCard: cardDataInterface) => void;
+  onShareNote: (noteId: number) => void;
+  isSharedNotes: boolean 
 }
 
-function Card({ data, onDeleteNote, onEditNote }: CardProps) {
+function Card({ data, onDeleteNote, onEditNote, onShareNote, isSharedNotes }: CardProps) {
   return (
     <div>
       <div className="card">
@@ -27,25 +36,31 @@ function Card({ data, onDeleteNote, onEditNote }: CardProps) {
         <div className="tags" id="noteTagsContainer">
           {data.tag}
         </div>
-        <div className="card-actions">
-          <button
-            onClick={() => onEditNote(data)}
-            type="button"
-            className="btn btn-primary editBtn"
-          >
-            Editar
-          </button>
-          <button
-            onClick={() => onDeleteNote(data.id)}
-            type="button"
-            className="btn btn-danger deleteBtn"
-          >
-            Eliminar
-          </button>
-          <button type="button" className="btn btn-success shareBtn">
-            Compartir
-          </button>
-        </div>
+        {isSharedNotes === true ? "" : 
+          <div className="card-actions">
+            <button
+              onClick={() => onEditNote(data)}
+              type="button"
+              className="btn btn-primary editBtn"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => onDeleteNote(data.id)}
+              type="button"
+              className="btn btn-danger deleteBtn"
+            >
+              Eliminar
+            </button>
+            <button
+              onClick={() => onShareNote(data.id)}
+              type="button"
+              className="btn btn-success shareBtn"
+            >
+              Compartir
+            </button>
+          </div>
+        }
       </div>
     </div>
   );

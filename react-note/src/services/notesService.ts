@@ -20,3 +20,11 @@ export async function fetchSharedNotes() {
     method: "GET",
   });
 }
+
+
+export async function fetchShareNote(userId: number, noteId: number) {
+  return await Fetch({
+    path: `notes/${noteId}/shared/${userId}`,
+    method: "POST",
+  });
+}
