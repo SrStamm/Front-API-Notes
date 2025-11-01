@@ -6,9 +6,10 @@ interface ListCardProps {
   onDeleteNote: (noteId: number) => void;
   onEditNote: (editCard: cardDataInterface) => void;
   onShareNote: (noteId: number) => void;
+  isSharedNotes: boolean 
 }
 
-function ListCard({ listCards, onDeleteNote, onEditNote, onShareNote }: ListCardProps) {
+function ListCard({ listCards, onDeleteNote, onEditNote, onShareNote, isSharedNotes }: ListCardProps) {
   return (
     <div className="grid">
       {listCards.map((item) => (
@@ -18,6 +19,7 @@ function ListCard({ listCards, onDeleteNote, onEditNote, onShareNote }: ListCard
           onDeleteNote={onDeleteNote}
           onEditNote={onEditNote}
           onShareNote={onShareNote}
+          isSharedNotes={isSharedNotes}
         />
       ))}
     </div>

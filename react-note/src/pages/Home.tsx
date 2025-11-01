@@ -219,6 +219,7 @@ export default function Home() {
           onDeleteNote={deleteNoteHandler}
           onEditNote={handleEditRequest}
           onShareNote={handleShareRequest}
+          isSharedNotes={false}
         />
       </>
     ) : (
@@ -241,6 +242,7 @@ export default function Home() {
             onDeleteNote={deleteNoteHandler}
             onEditNote={handleEditRequest}
             onShareNote={handleShareRequest}
+            isSharedNotes={true}
           />
         ) : (
           <h3>Nadie compartió notas contigo</h3>
